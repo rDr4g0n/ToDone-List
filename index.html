@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<link href="css/font-awesome.min.css" rel="stylesheet">
+	<style>
+
+		* { box-sizing: border-box; margin: 0; padding: 0; font-family: arial; }
+
+		body { background-color: #CCC; }
+		header { display: block; }
+
+		.timestamp { position: relative; width: 225px; background-color: white; border-radius: 4px; padding: 5px 10px; margin: 10px; color: #AAA;  }
+	</style>
+</head>
+<body>
+
+
+	<div class="timestamp">
+		Fri Nov 15 2013 22:00:55 GMT-0600 (Central Standard Time)
+	</div>
+
+	<template id="timestampTemplate">
+
+		<style>
+			header { font-size: .8em; border-bottom: solid #EEE 1px; padding-bottom: 4px;}
+			footer { font-size: .8em; border-top: solid #EEE 1px; padding-top: 4px;}
+			.datetime .large { display: inline-block; font-size: 3em; color: #BF0252; text-align: right; margin: 5px 0; letter-spacing: -.05em;}
+			.datetime .split { display: inline-block; text-align: left; color: #BF0252; padding-left: 5px; }
+			.edit { position: absolute; top: 5px; right: 5px; cursor: pointer; color: #CCC;}
+			.edit:hover { color: #999; }
+		</style>
+
+		<header>My timestamp name</header>
+		<div class="datetime">
+			<div class="large">
+				10:38
+			</div><div class="split">
+				<div class="top">pm</div>
+				<div class="bottom">&nbsp;</div>
+			</div>
+		</div>
+		<footer><content></content></footer>
+		<i class="fa fa-ellipsis-v fa-fw edit"></i>
+
+	</template>
+
+
+
+
+	<script src="lib/jquery-2.0.3.min.js"></script>
+	<script>
+/*		var host = document.querySelector(".timestamp");
+		host.textContent = "butt";
+		var shadow = host.webkitCreateShadowRoot();
+		var template = document.querySelector("#timestampTemplate");
+		shadow.appendChild(template.content.cloneNode(true));*/
+
+		var shadow = document.querySelector(".timestamp").webkitCreateShadowRoot();
+		var template = $("#timestampTemplate").html();
+		// TODO - handlebars process this thing
+/*JsDbg*/debugger;		shadow.appendChild( $(template).get().content );
+
+
+		// window.Timestamp = 
+
+	</script>
+</body>
+</html>
