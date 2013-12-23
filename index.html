@@ -1,69 +1,336 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-	<title></title>
+	<title>ToDone</title>
 	<meta charset="utf-8">
 	<link href="css/font-awesome.min.css" rel="stylesheet">
 	<style>
 
+		html, body { width: 100%; }
+
 		* { box-sizing: border-box; margin: 0; padding: 0; font-family: arial; }
 
-		body { background-color: #CCC; }
+		body { background-color: #CCC; padding: 10px; }
 		header { display: block; }
 
-		.timestamp { position: relative; width: 225px; background-color: white; border-radius: 4px; padding: 5px 10px; margin: 10px; color: #AAA;  }
+		.timestamp { position: relative; width: 100%; max-width: 400px; background-color: white; border-radius: 4px; color: #AAA; overflow: hidden; margin: 15px 0; }
+
+		.timestamp header { padding: 4px 8px; font-size: .8em; border-bottom: solid #EEE 1px; }
+
+		.timestamp .datetime { color: #BF0252; display: none; height: 90px; position: absolute; 
+			-webkit-transition: rotate3d 1s ease-in-out;}
+		.timestamp .datetime .large { padding: 4px 8px 0 8px; display: inline-block; font-size: 3em; letter-spacing: -.05em;}
+		.timestamp .datetime .med { padding: 4px 8px 2px 8px; display: inline-block; font-size: 2em; letter-spacing: -.05em;}
+		.timestamp .datetime .small { margin: -5px 0 7px 8px; color: #999;}
+		.timestamp .datetime .soopa { vertical-align: super; font-size: .5em; letter-spacing: 0; padding-left: 4px; }
+
+		.spinout { tramsform: rotateY(180deg) }
+
+		.timestamp.new { text-align: center; font-size: 5em; padding: 10px 0; cursor: pointer;}
+		.timestamp.new:active { color: #BF0252;}
+
+		.timestamp .edit { position: absolute; top: 5px; right: 5px; cursor: pointer; color: #CCC;}
+		.timestamp .edit:active { color: #999; }
+
+		.timestamp .tags { position: relative; padding: 6px 8px 2px 8px; font-size: .8em; border-top: solid #EEE 1px; margin-top: 90px;}
+		.timestamp .tags .tagIcon { padding-right: 4px; display: inline-block; }
+		.timestamp .tags .tag { display: inline-block; background-color: #DDD; margin: 0 2px 4px 2px; padding: 2px 6px; border-radius: 4px; }
+		.timestamp .tags .tag a { color: #999; text-decoration: none; }
+		.timestamp .tags .tag:active { color: #BF0252;}
+		.timestamp .tags .tag .removeTag { display: none; color: #BF0252; padding-right: 4px; }
+		.timestamp .tags .addTag { display: none; color: #BF0252; }
+
+
+		.timestamp .tags.editable .tagIcon { color: #BF0252; }
+		.timestamp .tags.editable .tag .removeTag { display: inline; color: #BF0252; padding-right: 4px; }
+		.timestamp .tags.editable .addTag { display: inline; }
 	</style>
 </head>
 <body>
 
+	<script type="text/x-underscore-template" id="timestampTemplate">
 
-	<div class="timestamp">
-		Fri Nov 15 2013 22:00:55 GMT-0600 (Central Standard Time)
-	</div>
+		<header><%= model.name %></header>
 
-	<template id="timestampTemplate">
+		<div class="datetimes"></div>
 
-		<style>
-			header { font-size: .8em; border-bottom: solid #EEE 1px; padding-bottom: 4px;}
-			footer { font-size: .8em; border-top: solid #EEE 1px; padding-top: 4px;}
-			.datetime .large { display: inline-block; font-size: 3em; color: #BF0252; text-align: right; margin: 5px 0; letter-spacing: -.05em;}
-			.datetime .split { display: inline-block; text-align: left; color: #BF0252; padding-left: 5px; }
-			.edit { position: absolute; top: 5px; right: 5px; cursor: pointer; color: #CCC;}
-			.edit:hover { color: #999; }
-		</style>
+		<ul class="tags">
+			<li class="tagIcon"><i class="fa fa-tags"></i></li>
+			<%= renderTags() %>
+			<li class="addTag"><i class="fa fa-plus-square fa-lg"></i></li>
+		</ul>
 
-		<header>My timestamp name</header>
-		<div class="datetime">
-			<div class="large">
-				10:38
-			</div><div class="split">
-				<div class="top">pm</div>
-				<div class="bottom">&nbsp;</div>
-			</div>
-		</div>
-		<footer><content></content></footer>
 		<i class="fa fa-ellipsis-v fa-fw edit"></i>
 
-	</template>
+	</script>
+
+	<script type="text/x-underscore-template" id="datetimeView0">
+		<div class="large">
+			<%= renderTimestamp("h:mm") %><span class="soopa"><%= renderTimestamp("a") %></span>
+		</div>			
+		<div class="small">
+			<%= renderTimestamp("MMM Do YYYY") %>, <%= renderTimestamp("fromNow") %>
+		</div>
+	</script>
+
+	<script type="text/x-underscore-template" id="datetimeView1">
+		<div class="large">
+			<%= renderTimestamp("MMM Do") %>
+		</div>
+		<div class="small">
+			<%= renderTimestamp("fromNow") %>, <%= renderTimestamp("h:mm a") %>
+		</div>
+	</script>
+
+	<script type="text/x-underscore-template" id="datetimeView2">
+		<div class="med">
+			<%= renderTimestamp("fromNow") %>
+		</div>			
+		<div class="small">
+			<%= renderTimestamp("MMM Do YYYY, h:mm a") %>
+		</div>
+	</script>
+
+	<div class="timestamp new">
+		<i class="fa fa-plus-circle"></i>
+	</div>
 
 
 
 
 	<script src="lib/jquery-2.0.3.min.js"></script>
+	<script src="lib/underscore.min.js"></script>
+	<script src="lib/moment.min.js"></script>
 	<script>
-/*		var host = document.querySelector(".timestamp");
-		host.textContent = "butt";
-		var shadow = host.webkitCreateShadowRoot();
-		var template = document.querySelector("#timestampTemplate");
-		shadow.appendChild(template.content.cloneNode(true));*/
 
-		var shadow = document.querySelector(".timestamp").webkitCreateShadowRoot();
-		var template = $("#timestampTemplate").html();
-		// TODO - handlebars process this thing
-/*JsDbg*/debugger;		shadow.appendChild( $(template).get().content );
+		/*
+		TODO
+		- tapping anywhere should probably cancel any pending edits
+			like add tag or change name
+		- timestamp options menu
+		- general options menu
+		- add tag menu
+			- new tag
+			- existing tags
+		- touch events
+		- holo theme 
+		- search/filter box
+		- animated transitions
+		 */
 
+		// when the user changes defaults, 
+		// this is the obj that is changed
+		var config = {
+			name: "New Timestamp",
+			tags: ["antibiotics", "feeding", "diaper change"],
+			display: 1,
+			cycleDisplays: false
+		};
 
-		// window.Timestamp = 
+		$(document).ready(function(){
+
+			$(".timestamp.new").on("click", function(){
+				$(".timestamp.new").after(new Timestamp(config).$el);
+				// TODO - animate in this new slide. 3d! make it look like
+				// part of the .new timestamp... in fact, make .new a state
+				// of the timestamp object!
+			});
+
+		});
+		
+
+		var Timestamp = (function(){
+
+			var timestampTemplate = _.template($("#timestampTemplate").html()),
+				datetimeTemplates = [
+					_.template($("#datetimeView0").html()),
+					_.template($("#datetimeView1").html()),
+					_.template($("#datetimeView2").html()),
+				],
+				NUM_DISPLAYS = datetimeTemplates.length,
+				DISPLAY_CYCLE_FREQ = 1000;
+
+			function DatetimeView(timestamp, template){
+				this.template = template;
+
+				this.model = {};
+				this.model.timestamp = timestamp;
+
+				this.$el = $("<div class='datetime'></div>");
+				this.render();
+			}
+
+			DatetimeView.prototype = {
+				constructor: DatetimeView,
+				render: function(){
+					this.$el.html(this.template(this));
+					return this.$el;
+				},
+
+				// render timestamp with supplied format
+				renderTimestamp: function(f){
+					if(f === "fromNow") return this.model.timestamp.fromNow();
+					else return this.model.timestamp.format(f);
+				},
+
+				show: function(){
+					// TODO - animate (3d transitions!)
+					this.$el.show();
+				},
+				hide: function(){
+					// TODO - animate (3d transitions!)
+					this.$el.hide();
+				}
+			}
+
+			function Timestamp(config){
+				var $datetimes;
+
+				config = config || {};
+
+				this.model = {};
+				this.model.timestamp = new moment();
+				this.model.name = config.name || "New Timestamp";
+				this.model.tags = config.tags.slice() || [];
+				this.model.display = config.display || 0;
+
+				this.currDisplay = this.model.display;
+				this.cycleInterval = undefined;
+
+				this.editingTags = false;
+
+				this.template = timestampTemplate;
+				this.datetimeTemplates = datetimeTemplates;
+				this.datetimes = [];
+
+				this.eventMap = {
+					// "click .datetime": "incrementCurrDisplay",
+					"click header": "updateName",
+					"click .tagIcon": "editTags",
+					"click .removeTag": "removeTag",
+					"click .addTag": "addTag",
+					"click .datetimes": "showNextDisplay"
+				}
+
+				this.$el = $("<div class='timestamp'></div>");
+				this.render();
+
+				$datetimes = this.$el.find(".datetimes");
+				this.datetimeTemplates.forEach(function(template){
+					this.datetimes.push(new DatetimeView(this.model.timestamp, template));
+					$datetimes.append(_.last(this.datetimes).$el);
+				}.bind(this));
+
+				this.$el.find(".datetime").eq(this.model.display).show();
+
+				this.bindEvents();
+
+				if(config.cycleDisplays) this.cycleDisplays();
+			}
+
+			Timestamp.prototype = {
+				constructor: Timestamp,
+				render: function(){
+					this.$el.html(this.template(this));
+					return this.$el;
+				}, 
+				bindEvents: function(){
+					var func, selector, eventAction;
+
+					for(var i in this.eventMap){
+						selector = i.split(" ");
+						eventAction = selector.shift();
+						selector = selector.join(" ");
+						func = this[this.eventMap[i]] || this.eventMap[i];
+
+						if (typeof (func) == "function") {
+							this.$el.on(eventAction, selector, func.bind(this));
+						}
+					}
+				},
+
+				// iterates tags and generates html for them
+				renderTags: function(){
+					var tagArr = [];
+					this.model.tags.forEach(function(tag){
+						tagArr.push('<li class="tag" data-name="'+ tag +'"><i class="fa fa-times removeTag"></i>');
+						tagArr.push('<a href="#/'+ tag +'">'+ tag +'</a></li>');
+					});
+					return tagArr.join("");
+				},
+
+				incrementCurrDisplay: function(){
+					/*this.currDisplay++;
+					this.render();*/
+					// TODO - transition in/out datetimes
+				},
+
+				cycleDisplays: function(){
+					this.cycleInterval = setInterval(this.showNextDisplay.bind(this), DISPLAY_CYCLE_FREQ);
+				},
+
+				hideAllDatetimes: function(){
+					this.datetimes.forEach(function(datetime){
+						datetime.hide();
+					});
+				},
+
+				showNextDisplay: function(){
+					this.currDisplay = (this.currDisplay+1) % NUM_DISPLAYS;
+					this.hideAllDatetimes();
+					this.datetimes[this.currDisplay].show();
+				},
+
+				// convert name field to an input and focus it
+				// so the user can update name
+				updateName: function(){
+					var $input = $("<input type='text' value='"+ this.model.name +"'>");
+					this.$el.find("header").empty().append($input);
+					$input.focus();
+					$input.on("blur", function(){
+						this.model.name = $input.val() || this.model.name;
+						this.$el.find("header").html(this.model.name);
+					}.bind(this));
+				},
+
+				// make tags editable
+				editTags: function(){
+					if(!this.editingTags){
+						this.editingTags = true;
+						this.$el.find(".tags").addClass("editable");
+					} else {
+						this.editingTags = false;
+						this.$el.find(".tags").removeClass("editable");
+					}
+				},
+
+				// remove tag
+				removeTag: function(e){
+					var $tag = $(e.currentTarget).closest(".tag"),
+						tagName = $tag.attr("data-name"),
+						tagIndex = this.model.tags.indexOf(tagName);
+
+					// remove from model
+					if(~tagIndex){
+						this.model.tags.splice(tagIndex, 1);
+					}
+
+					// remove from DOM
+					$tag.remove();
+				},
+
+				// bring up dialogue where a new tag can be created
+				// or selected from a list of tags
+				addTag: function(){
+					alert("add a tag!");
+				}
+			}
+
+			return Timestamp;
+		})();
+
+		
+
 
 	</script>
 </body>
