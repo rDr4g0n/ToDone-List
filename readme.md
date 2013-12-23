@@ -4,6 +4,7 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 * use touch events
 * animated transitions
 * persist to local storage (capture model changes)
+* holo theme? https://github.com/zmyaro/holo-web
 * timestamp menu
 	* edit name
 	* edit timestamp
@@ -22,3 +23,14 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 	* filter by tag(s)
 	* filter by name
 	* tapping tag populates filter box with that tag
+
+# V2 stuff
+* optimize render() (request animation frame? synchronize all renders?)
+* filter by duration
+* filter by timeframe
+* select multiple timestamps to sum them up
+* duration *between* timestamps
+* accurate to seconds instead of min
+* configurable colors?
+* light or dark themes
+* hashtag routing
