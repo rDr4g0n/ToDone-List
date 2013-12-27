@@ -2,8 +2,7 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 
 # TODO
 * use touch events
-* animated transitions
-* persist to local storage (capture model changes)
+* animated datetime transitions
 * holo theme? https://github.com/zmyaro/holo-web
 * timestamp menu
 	* edit name
@@ -23,6 +22,11 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 	* filter by tag(s)
 	* filter by name
 	* tapping tag populates filter box with that tag
+* make new timestamp box into a type
+	* create/load configs
+	* persist configs to localstorage
+* make localstorage function safe and more flexible
+* fix padding/margin issue on mobile
 
 # V2 stuff
 * optimize render() (request animation frame? synchronize all renders?)
@@ -34,3 +38,5 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 * configurable colors?
 * light or dark themes
 * hashtag routing
+* make localstorage methods not sucky
+* make Timestamp type store() trigger automatically with Timestamp property updates
