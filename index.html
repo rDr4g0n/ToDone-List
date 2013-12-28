@@ -5,18 +5,22 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="css/font-awesome.min.css" rel="stylesheet">
+	<link href="css/holo-base-elements.css" rel="stylesheet">
+	<link href="css/holo-base-widgets.css" rel="stylesheet">
+	<link href="css/holo-light-elements.css" rel="stylesheet">
+	<link href="css/holo-light-widgets.css" rel="stylesheet">
 	<style>
 
 		html, body { width: 100%; }
 
-		* { box-sizing: border-box; margin: 0; padding: 0; font-family: arial; }
+		* { box-sizing: border-box; margin: 0; padding: 0; }
 
 		body { background-color: #CCC; padding: 10px; }
 		header { display: block; }
 
-		.wrapper { margin: auto; max-width: 400px; }
+		.wrapper { margin: 50px auto 10px auto; max-width: 400px; }
 
-		.timestamp { position: relative; width: 100%; background-color: white; border-bottom: solid 2px #AAA; border-radius: 2px; color: #AAA; overflow: hidden; margin: 15px 0; max-height: 400px; -webkit-transform: scale(1, 1); -webkit-transform-origin: 50% 0%;
+		.timestamp { position: relative; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; max-height: 400px; -webkit-transform: scale(1, 1); -webkit-transform-origin: 50% 0%;
 			-webkit-transition: opacity .5s, -webkit-transform .25s, max-height ease-out .5s; 
 		}
 		.timestamp.enter { opacity: 0; -webkit-transform: scale(.25, 0); max-height: 0;}
@@ -31,9 +35,8 @@
 		.timestamp .datetime .small { margin: -5px 0 7px 8px; color: #999;}
 		.timestamp .datetime .soopa { vertical-align: super; font-size: .5em; letter-spacing: 0; padding-left: 4px; }
 
-		.timestamp.new { text-align: center; padding: 10px 0; cursor: pointer; }
-		.timestamp.new .plusIcon { font-size: 5em; }
-		.timestamp.new:active { color: #BF0252;}
+		.new { cursor: pointer; }
+		.new:active { color: #BF0252;}
 
 		.timestamp .edit { position: absolute; top: 5px; right: 5px; cursor: pointer; color: #CCC;}
 		.timestamp .edit:active { color: #999; }
@@ -97,21 +100,19 @@
 		</div>
 	</script>
 
-	<div class="wrapper">
+	<header class="actionBar">
+		<span style="margin:8px;"><i class="fa fa-check-square-o fa-lg"></i> ToDone</span>
+		<button style="float:right;" class="new"><i class="fa fa-plus fa-2x"></i></button>
+		<button style="float:right;" class=""><i class="fa fa-search fa-lg"></i></button>
+	</header>
 
-		<div class="timestamp new">
-			<i class="fa fa-plus-circle plusIcon"></i>
-			<div>New Timestamp</div>
-		</div>
-
-	</div>
-
-
-
+	<div class="wrapper"></div>
 
 	<script src="lib/jquery-2.0.3.min.js"></script>
 	<script src="lib/underscore.min.js"></script>
 	<script src="lib/moment.min.js"></script>
+	<script src="lib/holo-touch.js"></script>
+	<script src="lib/ls.js"></script>
 	<script>
 
 		// when the user changes defaults, 
@@ -124,26 +125,26 @@
 
 		$(document).ready(function(){
 
-			$(".timestamp.new").on("click", function(){
-				$(".timestamp.new").after(new Timestamp(config).$el);
+			$(".new").on("click", function(){
+				$(".wrapper").prepend(new Timestamp(config).$el);
 				// TODO - animate in this new slide. 3d! make it look like
 				// part of the .new timestamp... in fact, make .new a state
 				// of the timestamp object!
 			});
 
-			var ls = lsRetrieve(),
+			var localSto = ls.get(),
 				counter = 0;
 
-			for(var i in ls.timestamps){
+			for(var i in localSto.timestamps){
 				// TODO - cap entry animation to 10 entries or so
 				(function(i){
 					setTimeout(function(){					
-						$(".timestamp.new").after(new Timestamp({
-							id: ls.timestamps[i].id,
-							display: ls.timestamps[i].display,
-							name: ls.timestamps[i].model.name,
-							tags: ls.timestamps[i].model.tags,
-							timestamp: ls.timestamps[i].model.timestamp
+						$(".wrapper").prepend(new Timestamp({
+							id: localSto.timestamps[i].id,
+							display: localSto.timestamps[i].display,
+							name: localSto.timestamps[i].model.name,
+							tags: localSto.timestamps[i].model.tags,
+							timestamp: localSto.timestamps[i].model.timestamp
 						}).$el);
 					}, 100*counter);
 				})(i);
@@ -151,8 +152,8 @@
 				counter++;
 			}
 
-			if(Object.keys(ls.timestamps).length === 0){
-				$(".timestamp.new").after(new Timestamp({
+			if(Object.keys(localSto.timestamps).length === 0){
+				$(".wrapper").prepend(new Timestamp({
 					name: "First launch of ToDone",
 					tags: ["awesome"],
 					display: 1
@@ -238,7 +239,8 @@
 					"click .tagIcon": "editTags",
 					"click .removeTag": "removeTag",
 					"click .addTag": "addTag",
-					"click .datetimes": "showNextDisplay"
+					"click .datetimes": "showNextDisplay",
+					"click .edit": "delete"
 				}
 
 				this.$el = $("<div class='timestamp enter'></div>");
@@ -356,11 +358,23 @@
 				// store in localstorage anytime model or config changes
 				store: function(){
 					// TODO - cycleDisplay property
-					lsStore({
+					ls.set({
 						id: this.id,
 						display: this.display,
 						model: this.model
 					});
+				},
+
+				delete: function(){
+					ls.remove(this.id);
+					// TODO - cleaner removal of dom element
+					// TODO - make .remove animate
+					// TODO - animation helper that takes care of
+					// 		adding class and removing class after 
+					// 		animation complete using transitionend
+					this.$el.addClass("remove");
+					setTimeout(function(){this.$el.remove();}.bind(this), 500);
+					
 				}
 			}
 
@@ -373,34 +387,6 @@
 				return v.toString(16);
 			});
 		}
-
-		// TODO - dont update if locked / auto-retry if locked
-		// TODO - store other objects
-		var lsStore = (function(){
-
-			var locked = false;
-
-			return function(obj){
-
-				if(!localStorage.ToDone){
-					localStorage.ToDone = '{"configs": {}, "timestamps": {}}';
-				}
-
-				var ls = JSON.parse(localStorage.ToDone);
-
-				ls.timestamps[obj.id] = obj;
-
-				localStorage.ToDone = JSON.stringify(ls);
-			};
-
-		})();
-
-		var lsRetrieve = function(){
-			if(!localStorage.ToDone){
-				localStorage.ToDone = '{"configs": {}, "timestamps": {}}';
-			}
-			return JSON.parse(localStorage.ToDone);
-		};
 
 
 	</script>
