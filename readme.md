@@ -2,7 +2,6 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 
 # TODO
 * use touch events
-* animated datetime transitions
 * holo theme? https://github.com/zmyaro/holo-web
 * timestamp menu
 	* edit name
@@ -25,12 +24,13 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 * make new timestamp box into a type
 	* create/load configs
 	* persist configs to localstorage
-* make localstorage function safe and more flexible
+* make localstorage interface safe and more flexible
 * local copy of roboto font with more faces
-* android-like notifications (when item added, deleted, etc)
+* android-like notifications (when item added, deleted, etc) with undo option
+* light and dark theme
 
 BUGS
-* sometimes timestamps dont animate in in the proper order
+* frequently timestamps dont animate in in the proper order
 
 # V2 stuff
 * optimize render() (request animation frame? synchronize all renders?)
@@ -40,7 +40,8 @@ BUGS
 * duration *between* timestamps
 * accurate to seconds instead of min
 * configurable colors?
-* light or dark themes
 * hashtag routing
 * make localstorage methods not sucky
 * make Timestamp type store() trigger automatically with Timestamp property updates
+* export lists to text doc
+* sync across devices somehow? maybe export db?

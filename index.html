@@ -11,7 +11,7 @@
 	<link href="css/holo-light-widgets.css" rel="stylesheet">
 	<link href="css/style.css" rel="stylesheet">
 </head>
-<body>
+<body class="dark">
 
 	<script type="text/x-underscore-template" id="timestampTemplate">
 
@@ -95,7 +95,7 @@
 			// TODO - sort timestamps by timestamp :/
 			localSto.timestamps.forEach(function(timestamp, i){
 				var max = i >= MAX_ENTER_ANIMATE ? true : false,
-					time = 500 * (max ? MAX_ENTER_ANIMATE : i);
+					time = 200 * (max ? MAX_ENTER_ANIMATE : i);
 
 				setTimeout(function(){
 					console.log(i, max, time);

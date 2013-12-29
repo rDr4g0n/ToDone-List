@@ -40,7 +40,21 @@ header { display: block; }
 .timestamp .tags .tag .removeTag { display: none; color: #BF0252; padding-right: 4px; }
 .timestamp .tags .addTag { display: none; color: #BF0252; }
 
-
 .timestamp .tags.editable .tagIcon { color: #BF0252; }
 .timestamp .tags.editable .tag .removeTag { display: inline; color: #BF0252; padding-right: 4px; }
 .timestamp .tags.editable .addTag { display: inline; }
+
+
+body.dark:before { background-image: -webkit-linear-gradient(#000000, #272D33); }
+.dark .timestamp header { color: white; }
+.dark .timestamp { background-color: #3B3B3B; border-bottom: solid 2px black; }
+.dark .timestamp header { border-bottom: solid 2px #4A4A4A; }
+.dark .timestamp .tags { border-top: solid 2px #4A4A4A; color: white; }
+.dark .timestamp .tags .tag { background-color: #4A4A4A;}
+.dark .timestamp .tags .tag:active { color: #4A4A4A;}
+.dark .timestamp .tags .tag .tagIcon { color: white;}
+.dark .timestamp .tags .tag a { color: white; }
+.dark .timestamp .tags .addTag { color: white; }
+.dark .timestamp .tags .tag .removeTag { color: white; }
+.dark .timestamp .tags.editable .tagIcon { color: white; }
+.dark .timestamp .tags.editable .tag .removeTag { display: inline; color: white; padding-right: 4px; }

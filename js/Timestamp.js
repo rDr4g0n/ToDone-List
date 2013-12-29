@@ -162,10 +162,14 @@ window.Timestamp = (function(){
 		// convert name field to an input and focus it
 		// so the user can update name
 		updateName: function(){
+
+			// if already updating, dont try to update again
+			if(this.$el.find("header input").length) return;
+
 			var $input = $("<input type='text' value='"+ this.model.name +"'>");
 			this.$el.find("header").empty().append($input);
 			$input.focus();
-			$input.on("change blur", function(){
+			$input.on("blur change", function(e){
 				this.model.name = $input.val() || this.model.name;
 				this.$el.find("header").html(this.model.name);
 				this.store();
