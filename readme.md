@@ -26,8 +26,11 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 	* create/load configs
 	* persist configs to localstorage
 * make localstorage function safe and more flexible
-* fix padding/margin issue on mobile
 * local copy of roboto font with more faces
+* android-like notifications (when item added, deleted, etc)
+
+BUGS
+* sometimes timestamps dont animate in in the proper order
 
 # V2 stuff
 * optimize render() (request animation frame? synchronize all renders?)

@@ -5,17 +5,24 @@ window.ls = (function(){
 		// ToDone config
 		// TODO - accept object key (config or timestamp)
 		if(!localStorage.ToDone){
-			localStorage.ToDone = '{"configs": {}, "timestamps": {}}';
+			store('{"configs": [], "timestamps": []}');
 		}
 
 		var lsToDone = JSON.parse(localStorage.ToDone);
 
 		if(id){
-			return lsToDone.timestamps[id];
+			return _.findWhere(ls.timestamps, {id: id});
 		} else {
 			return lsToDone;
-		}
+		}		
+	};
 
+	var store = function(obj){
+		if(typeof obj === "string"){
+			obj = JSON.parse(obj);
+		}
+		
+		localStorage.ToDone = JSON.stringify(obj);
 		
 	};
 
@@ -28,12 +35,16 @@ window.ls = (function(){
 			var locked = false;
 
 			return function(obj){
-
 				var ls = fetch();
+				var idIndex = _.indexOf(ls.timestamps, _.findWhere(ls.timestamps, {id: obj.id}));
 
-				ls.timestamps[obj.id] = obj;
+				if(~idIndex){
+					ls.timestamps.splice(idIndex, 1, obj);
+				} else {
+					ls.timestamps.unshift(obj);
+				}
 
-				localStorage.ToDone = JSON.stringify(ls);
+				store(ls);
 			};
 
 		})(),
@@ -45,11 +56,15 @@ window.ls = (function(){
 
 		remove: function(id){
 			var ls = fetch();
-			delete ls.timestamps[id];
+			var idIndex = _.indexOf(ls.timestamps, _.findWhere(ls.timestamps, {id: id}));
+			if(~idIndex){
+				ls.timestamps.splice(idIndex, 1);
+				store(ls);
+			}
 		},
 
 		asplode: function(){
-			localStorage.ToDone = '{"configs": {}, "timestamps": {}}';
+			store('{"configs": [], "timestamps": []}');
 		}
 
 	};
