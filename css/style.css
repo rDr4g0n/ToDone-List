@@ -1,9 +1,37 @@
-html, body { width: 100%; }
+@font-face{
+	font-family: "Roboto";
+	src: url("roboto-regular-webfont.woff");
+	font-weight: normal;
+}
+@font-face{
+	font-family: "Roboto";
+	src: url("roboto-light-webfont.woff");
+	font-weight: 200;
+}
+
+html, body { width: 100%; font-family: Roboto, "Droid Sans", Arial, Helvetica, sans-serif; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body { padding: 10px; }
+body { padding: 10px; background-color: #EEE; }
 header { display: block; }
+
+.actionBar{
+	width: 100%;
+	display:block;
+	position:fixed;
+	top:0px;
+	left:0px;
+	height:40px;
+	-webkit-box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.1);	
+	z-index: 50;
+
+	background-color:#DDDDDD;
+	border-bottom: solid 2px #D2D2D2;
+}
+.actionBar span { margin: 8px; display:inline-block; }
+.actionBar a { color: black; font-size:.7em; text-transform:uppercase; padding: 8px 12px; }
+.actionBar a:active { background-color: #CCC; }
 
 .wrapper { margin: 50px auto 10px auto; max-width: 400px; }
 
@@ -14,16 +42,16 @@ header { display: block; }
 .timestamp.enter { -webkit-transform: translateX(-400px); max-height: 0;}
 .timestamp.remove { opacity: 0; -webkit-transform: translateX(-400px); max-height: 0;}
 
-.timestamp header { padding: 4px 8px; font-size: 1em; border-bottom: solid #EEE 1px; color: #BF0252; }
+.timestamp header { padding: 4px 8px; font-size: 1em; border-bottom: dotted #EEE 2px; color: #BF0252; }
 
 .timestamp .datetimes { }
-.timestamp .datetime { height: 90px; position: absolute; width: 300px; display: none; -webkit-transition: all ease-in-out .5s; }
-.timestamp .datetime.left { -webkit-transform: translateX(-400px); }
-.timestamp .datetime.right { -webkit-transform: translateX(400px); }
+.timestamp .datetime { height: 90px; position: absolute; width: 300px; display: none; -webkit-transition: all ease-in-out .2s; opacity: 1; }
+.timestamp .datetime.top { -webkit-transform: translateY(-30px); opacity: 0; }
+.timestamp .datetime.bottom { -webkit-transform: translateY(30px); opacity: 0; }
 
-.timestamp .datetime .large { margin: 4px 8px 0 8px; display: inline-block; font-size: 3em; letter-spacing: -.05em;}
-.timestamp .datetime .med { margin: 4px 8px 2px 8px; display: inline-block; font-size: 2em; letter-spacing: -.05em;}
-.timestamp .datetime .small { margin: -5px 0 7px 8px; color: #999;}
+.timestamp .datetime .large { margin: 0 8px; display: inline-block; font-size: 3em; font-weight: 200; letter-spacing: -.05em; }
+.timestamp .datetime .med { margin: 4px 8px 2px 8px; display: inline-block; font-size: 2em; font-weight: 200; letter-spacing: -.05em;}
+.timestamp .datetime .small { margin: -10px 0 7px 8px; color: #999;}
 .timestamp .datetime .soopa { vertical-align: super; font-size: .5em; letter-spacing: 0; padding-left: 4px; }
 
 .new { cursor: pointer; }
@@ -32,7 +60,7 @@ header { display: block; }
 .timestamp .edit { position: absolute; top: 8px; right: 5px; cursor: pointer; color: #CCC;}
 .timestamp .edit:active { color: #999; }
 
-.timestamp .tags { position: relative; padding: 6px 8px 2px 8px; font-size: .8em; border-top: solid #EEE 1px; margin-top: 90px; color: #BF0252; } 
+.timestamp .tags { position: relative; padding: 6px 8px 2px 8px; font-size: .8em; border-top: dotted #EEE 2px; margin-top: 90px; color: #BF0252; } 
 .timestamp .tags .tagIcon { padding-right: 4px; display: inline-block; }
 .timestamp .tags .tag { display: inline-block; background-color: #DDD; margin: 0 2px 4px 2px; padding: 2px 6px; border-radius: 4px; }
 .timestamp .tags .tag a { color: #BF0252; text-decoration: none; }
@@ -45,16 +73,22 @@ header { display: block; }
 .timestamp .tags.editable .addTag { display: inline; }
 
 
-body.dark:before { background-image: -webkit-linear-gradient(#000000, #272D33); }
-.dark .timestamp header { color: white; }
-.dark .timestamp { background-color: #3B3B3B; border-bottom: solid 2px black; }
-.dark .timestamp header { border-bottom: solid 2px #4A4A4A; }
-.dark .timestamp .tags { border-top: solid 2px #4A4A4A; color: white; }
-.dark .timestamp .tags .tag { background-color: #4A4A4A;}
-.dark .timestamp .tags .tag:active { color: #4A4A4A;}
+.dialogWrapper { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 100; background-color: rgba(0,0,0,.5); }
+.dialogWrapper.fade { background-color: rgba(0,0,0,0); }
+.dialog { width: 85%; height: 85%; position: absolute; top: 7%; left: 7%; z-index: 101; background-color: white; -webkit-transform: scale(1,1); opacity: 1; }
+.dialog.zoom { -webkit-transform: scale(.5,.5); opacity: 0; }
+
+body.dark { background: #212121; }
+.dark .actionBar a { color: white; }
+.dark .timestamp { background-color: #353535; border-bottom-color: black; color: #888;}
+.dark .timestamp header { color: white; border-bottom-color: #3d3d3d; }
+.dark .timestamp .tags { border-top-color: #3d3d3d; color: white; }
+.dark .timestamp .tags .tag { background-color: #3d3d3d;}
+.dark .timestamp .tags .tag:active { color: #3d3d3d;}
 .dark .timestamp .tags .tag .tagIcon { color: white;}
 .dark .timestamp .tags .tag a { color: white; }
 .dark .timestamp .tags .addTag { color: white; }
 .dark .timestamp .tags .tag .removeTag { color: white; }
 .dark .timestamp .tags.editable .tagIcon { color: white; }
 .dark .timestamp .tags.editable .tag .removeTag { display: inline; color: white; padding-right: 4px; }
+.dark .actionBar { background-color: #333; border-bottom-color: #1F1F1F; border-top-color: #1F1F1F; color: white; }

@@ -15,11 +15,17 @@ window.Timestamp = (function(){
 		this.model = {};
 		this.model.timestamp = timestamp;
 
-		this.cssAnims = {
-			"left": 500,
-			"right": 500
-		};
-		this.animate = cssAnimate;
+		this.animate = function(stop, start, cb){
+			cssAnimate(this.$el, {
+				stop: stop,
+				start: start,
+				callback: cb,
+				cssAnims: {
+					"top": 200,
+					"bottom": 200
+				}
+			});
+		}.bind(this);
 
 		this.$el = $("<div class='datetime'></div>");
 		this.render();
@@ -43,13 +49,13 @@ window.Timestamp = (function(){
 		show: function(){
 			if(this.$el.not(":visible")){
 				this.$el.show();
-				this.animate(".", "right");
+				this.animate(null, "top");
 			}
 		},
 
 		hide: function(){
 			if(this.$el.is(":visible")){
-				this.animate("left", null, function(){this.$el.hide();});
+				this.animate("bottom", null, function(){this.$el.hide();}.bind(this));
 			}
 		}
 	};
@@ -84,18 +90,24 @@ window.Timestamp = (function(){
 			"click .datetimes": "showNextDisplay",
 			"click .edit": "del"
 		};
+	
+		eventEmitter.call(this);
 
-		// allows this object to perform css animations
-		// on itself (ewww)
-		this.cssAnims = {
-			"enter": 350,
-			"remove": 350
-		};
-		this.animate = cssAnimate;
+		this.animate = function(stop, start, cb){
+			cssAnimate(this.$el, {
+				stop: stop,
+				start: start,
+				callback: cb,
+				cssAnims: {
+					"enter": 350,
+					"remove": 350
+				}
+			});
+		}.bind(this);
 
 		this.$el = $("<div class='timestamp'></div>");
 		this.render();
-		if(animateIn) this.animate(".", "enter");
+		if(animateIn) this.animate(null, "enter");
 
 		$datetimes = this.$el.find(".datetimes");
 		this.datetimeTemplates.forEach(function(template){
@@ -212,21 +224,30 @@ window.Timestamp = (function(){
 			this.store();
 		},
 
-		// store in localstorage anytime model or config changes
-		store: function(){
-			// TODO - cycleDisplay property
-			ls.set({
+		getParsable: function(){
+			return {
 				id: this.id,
 				display: this.display,
 				model: this.model
-			});
+			};
+		},
+
+		// store in localstorage anytime model or config changes
+		store: function(){
+/*			ls.set({
+				id: this.id,
+				display: this.display,
+				model: this.model
+			});*/
+			this.emit("dirty");
 		},
 
 		del: function(){
-			ls.remove(this.id);
+			// ls.remove(this.id);
+			this.emit("delete", this);
 			// TODO - cleaner/complete removal of dom element
 			this.$el.off();
-			this.animate("remove", null, function(){this.$el.remove();}.bind(this));					
+			this.animate("remove", null, function(){this.$el.remove();}.bind(this));				
 		}
 	};
 

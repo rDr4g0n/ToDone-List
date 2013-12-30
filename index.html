@@ -5,13 +5,9 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	<link href="css/font-awesome.min.css" rel="stylesheet">
-	<link href="css/holo-base-elements.css" rel="stylesheet">
-	<link href="css/holo-base-widgets.css" rel="stylesheet">
-	<link href="css/holo-light-elements.css" rel="stylesheet">
-	<link href="css/holo-light-widgets.css" rel="stylesheet">
 	<link href="css/style.css" rel="stylesheet">
 </head>
-<body class="dark">
+<body class="">
 
 	<script type="text/x-underscore-template" id="timestampTemplate">
 
@@ -58,8 +54,8 @@
 
 	<header class="actionBar">
 		<span style="margin:8px;"><i class="fa fa-check-square-o fa-lg"></i> ToDone</span>
-		<button style="float:right;" class="new"><i class="fa fa-plus fa-2x"></i></button>
-		<button style="float:right;" class=""><i class="fa fa-search fa-lg"></i></button>
+		<a href="#" style="float:right;" class="new"><i class="fa fa-plus fa-2x"></i></a>
+		<a href="#" style="float:right;" class=""><i class="fa fa-search fa-2x"></i></a>
 	</header>
 
 	<div class="wrapper"></div>
@@ -67,8 +63,8 @@
 	<script src="lib/jquery-2.0.3.min.js"></script>
 	<script src="lib/underscore.min.js"></script>
 	<script src="lib/moment.min.js"></script>
-	<script src="lib/holo-touch.js"></script>
 	<script src="js/ls.js"></script>
+	<script src="js/eventEmitter.js"></script>
 	<script src="js/Timestamp.js"></script>
 	<script>
 
@@ -76,46 +72,25 @@
 		// TODO - make this an array of configs that are
 		// 		saved/loaded from ls
 		var config = {
-			name: "New Timestamp",
-			tags: ["antibiotics", "feeding", "diaper change"],
+			model: {
+				name: "New Timestamp",
+				tags: ["antibiotics", "feeding", "diaper change"]
+			},
 			display: 2
 		};
 
 		$(document).ready(function(){
 
+			var timestampThread = new TimestampThread(ls.get().timestamps.reverse() || [], $(".wrapper"));
+
 			// TODO - move all of this into a TimestampThread
 			// 		type to allow for many threads of timestamps
 			$(".new").on("click", function(){
-				$(".wrapper").prepend(new Timestamp(config, true).$el);
-			});
-
-			var localSto = ls.get(),
-				MAX_ENTER_ANIMATE = 4;
-
-			// TODO - sort timestamps by timestamp :/
-			localSto.timestamps.forEach(function(timestamp, i){
-				var max = i >= MAX_ENTER_ANIMATE ? true : false,
-					time = 200 * (max ? MAX_ENTER_ANIMATE : i);
-
-				setTimeout(function(){
-					console.log(i, max, time);
-					$(".wrapper").append(new Timestamp({
-						id: timestamp.id,
-						display: timestamp.display,
-						name: timestamp.model.name,
-						tags: timestamp.model.tags,
-						timestamp: timestamp.model.timestamp
-					}, !max).$el);
-				}, time);
-			});
-
-			if(localSto.timestamps.length === 0){
-				$(".wrapper").prepend(new Timestamp({
-					name: "First launch of ToDone",
-					tags: ["awesome"],
-					display: 2
-				}, true).$el);
-			}			
+				var timestamp = timestampThread.add(config);
+				// TODO - have timestampThread do the prepend/animate?
+				$(".wrapper").prepend(timestamp.$el);
+				timestamp.animate(null, "enter");
+			});		
 
 		});		
 
@@ -126,29 +101,130 @@
 			});
 		}
 
-		// assumed this.$el and this.cssAnims
-		// TODO - allow arrays of classes?
-		// TODO - improve stops "." thing...
-		function cssAnimate(stop, start, cb){
+		// ehhh still not too happy with this function :/
+		function cssAnimate($el, opts){
+
+			var start = opts.start,
+				stop = opts.stop,
+				cb = opts.callback,
+				cssAnims = opts.cssAnims;
+
+			// TODO - return false if required options are absent
 
 			if(start){
-				this.$el.addClass(start);
+				$el.addClass(start);
 				setTimeout(function(){
-					this.$el.removeClass(start)
-					if(stop !== ".") this.$el.addClass(stop);
-				}.bind(this), 0);
+					$el.removeClass(start)
+					if(stop) $el.addClass(stop);
+				}, 0);
 			} else {
-				if(stop !== ".") this.$el.addClass(stop);
+				if(stop) $el.addClass(stop);
 			}
 
 			// TODO - use event listener instead of timer
 			// TODO - return something...?
 			setTimeout(function(){
-				if(stop !== ".") this.$el.removeClass(stop);
+				if(stop) $el.removeClass(stop);
 				// TODO - args?
-				if(cb) cb.call(this);
-			}.bind(this), this.cssAnims[stop] || 500);
+				if(cb) cb();
+			}, cssAnims[stop] || 500);
 		}
+
+		// TODO - remove this when done testing
+		function asplode(){
+			localStorage.ToDone = '{"configs": [], "timestamps": []}';
+		}
+
+		function popDialog(){
+			/*var wrap = $("<div class='dialogWrapper'></div>"),
+				dialog = $("<div class='dialog'>asdf</div>");
+
+			wrap.append(dialog);
+
+			$("body").append(wrap);*/
+
+
+		}
+
+		function TimestampThread(timestamps, $el){
+			this.timestamps = [];
+			this.$el = $el;
+
+			var MAX_ENTER_ANIMATE = 5;
+
+			// create Timestamp objects
+			timestamps.forEach(this.add.bind(this));
+
+			// if no timestamps, create a default one
+			if(timestamps.length === 0){
+				this.add({
+					model: {
+						name: "First launch of ToDone",
+						tags: ["awesome"]
+					},
+					display: 2
+				});
+			}
+
+			// attach to DOM and attach event listeners
+			this.timestamps.forEach(function(timestamp, i){
+				var max = i >= MAX_ENTER_ANIMATE ? true : false,
+					time = 150 * (max ? MAX_ENTER_ANIMATE : i);
+
+				setTimeout(function(){				
+					this.$el.append(timestamp.$el);
+					if(!max) timestamp.animate(".", "enter");
+				}.bind(this), time);
+			}.bind(this));
+		}
+
+		TimestampThread.prototype = {
+			constructor: TimestampThread,
+			add: function(timestamp){
+				timestamp.model = timestamp.model || {tags: []};
+
+				var ts = new Timestamp({
+					id: timestamp.id,
+					display: timestamp.display,
+					name: timestamp.model.name,
+					tags: timestamp.model.tags,
+					timestamp: timestamp.model.timestamp
+				});
+
+				ts.on("dirty", function(){
+					this.store();
+				}.bind(this));
+
+				ts.on("delete", function(timestamp){
+					var timestampIndex = this.timestamps.indexOf(timestamp);
+					if(~timestampIndex){
+						this.timestamps.splice(timestampIndex, 1);
+						this.store();
+					}
+				}.bind(this));
+
+				this.timestamps.unshift(ts);
+				this.store();
+				return ts;
+			},
+			// TODO - debounce!
+			store: function(){
+				var configs = this.fetch().configs,
+					timestamps = [];
+
+				this.timestamps.forEach(function(timestamp){
+					timestamps.push(timestamp.getParsable());
+				});
+
+				localStorage.ToDone = JSON.stringify({configs: configs, timestamps: timestamps});
+			},
+			fetch: function(){
+				if(!localStorage.ToDone){
+					store('{"configs": [], "timestamps": []}');
+				}
+				return JSON.parse(localStorage.ToDone);
+			}
+		};
 
 
 	</script>
