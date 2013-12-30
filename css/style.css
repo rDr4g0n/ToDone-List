@@ -33,9 +33,9 @@ header { display: block; }
 .actionBar a { color: black; font-size:.7em; text-transform:uppercase; padding: 8px 12px; }
 .actionBar a:active { background-color: #CCC; }
 
-.wrapper { margin: 50px auto 10px auto; max-width: 400px; }
+.wrapper { margin: 0 auto 10px auto; max-width: 400px; }
 
-.timestamp { position: relative; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; max-height: 400px; -webkit-transform: scale(1, 1) translateY(0) translateX(0); -webkit-transform-origin: 50% 0%;
+.timestamp, #newTimestamp { position: relative; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; max-height: 400px; -webkit-transform: scale(1, 1) translateY(0) translateX(0); -webkit-transform-origin: 50% 0%;
 	-webkit-transition: opacity .35s, -webkit-transform .25s, max-height ease-out .35s; 
 }
 /*.timestamp.enter { opacity: 0; -webkit-transform: scale(.25, 0); max-height: 0;}*/
@@ -54,9 +54,6 @@ header { display: block; }
 .timestamp .datetime .small { margin: -10px 0 7px 8px; color: #999;}
 .timestamp .datetime .soopa { vertical-align: super; font-size: .5em; letter-spacing: 0; padding-left: 4px; }
 
-.new { cursor: pointer; }
-.new:active { color: #BF0252;}
-
 .timestamp .edit { position: absolute; top: 8px; right: 5px; cursor: pointer; color: #CCC;}
 .timestamp .edit:active { color: #999; }
 
@@ -72,6 +69,15 @@ header { display: block; }
 .timestamp .tags.editable .tag .removeTag { display: inline; color: #BF0252; padding-right: 4px; }
 .timestamp .tags.editable .addTag { display: inline; }
 
+
+.newTimestamp { position: fixed !important; top: 45px; left: 0; z-index: 10;
+	-webkit-transition: -webkit-box-shadow .2s, top .3s !important;
+}
+.newTimestamp.stickied { -webkit-box-shadow: 0 5px 15px 0 rgba(0,0,0,.5); }
+
+select, input { font-family: inherit; font-size: inherit; color: inherit; outline: none; border: none;}
+select { -webkit-appearance: menulist-text; }
+::selection { background: pink; color: pink;}
 
 .dialogWrapper { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 100; background-color: rgba(0,0,0,.5); }
 .dialogWrapper.fade { background-color: rgba(0,0,0,0); }

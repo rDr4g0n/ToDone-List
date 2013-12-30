@@ -54,11 +54,23 @@
 
 	<header class="actionBar">
 		<span style="margin:8px;"><i class="fa fa-check-square-o fa-lg"></i> ToDone</span>
-		<a href="#" style="float:right;" class="new"><i class="fa fa-plus fa-2x"></i></a>
 		<a href="#" style="float:right;" class=""><i class="fa fa-search fa-2x"></i></a>
 	</header>
 
-	<div class="wrapper"></div>
+	<div id="newTimestamp" class="newTimestamp">
+		<div class="newTimestampIcon" style="text-align: center; padding: 10px; font-size: 1.2em; border-bottom: dotted 2px #EEE; color: #BF0252;">
+			<i class="fa fa-plus"></i> Add Timestamp
+		</div>
+		<div style="text-align: center; padding: 10px; ">
+			Preset: <select>
+				<option>Default</option>
+				<option>Feeding</option>
+			</select>
+		</div>
+	</div>
+
+
+	<div class="wrapper" style="margin-top: 150px;"></div>
 
 	<script src="lib/jquery-2.0.3.min.js"></script>
 	<script src="lib/underscore.min.js"></script>
@@ -66,6 +78,7 @@
 	<script src="js/ls.js"></script>
 	<script src="js/eventEmitter.js"></script>
 	<script src="js/Timestamp.js"></script>
+	<script src="js/TimestampThread.js"></script>
 	<script>
 
 		// default config
@@ -81,18 +94,26 @@
 
 		$(document).ready(function(){
 
+			// TODO - multiple timestampThreads
 			var timestampThread = new TimestampThread(ls.get().timestamps.reverse() || [], $(".wrapper"));
 
 			// TODO - move all of this into a TimestampThread
 			// 		type to allow for many threads of timestamps
-			$(".new").on("click", function(){
+			$(".newTimestampIcon").on("click", function(){
 				var timestamp = timestampThread.add(config);
 				// TODO - have timestampThread do the prepend/animate?
 				$(".wrapper").prepend(timestamp.$el);
 				timestamp.animate(null, "enter");
-			});		
+			});
 
-		});		
+			// position and size new timestamp junk.
+			// HACK - fix! doesnt work on page resize! ugly!
+			// 		also the margin seems to be off by 1px :/ gah hacks
+			$("#newTimestamp").width($(".wrapper").width()).css("left", ($(".wrapper").css("margin-left")));
+			// make new timestamp thing appear when needed, and hide and stuff
+			$(window).on("scroll", scrollMug);
+
+		});
 
 		function uuid() {
 			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -142,89 +163,91 @@
 			wrap.append(dialog);
 
 			$("body").append(wrap);*/
-
-
 		}
 
-		function TimestampThread(timestamps, $el){
-			this.timestamps = [];
-			this.$el = $el;
+		// this version doesnt perform well on mobile
+/*		var scrollMug = (function($el){
+			var originalVal = window.scrollY,
+				prevVal = originalVal,
+				newTimestampHeight = $el.outerHeight(),
+				originalTop = parseInt($el.css("top")),
+				top = originalTop,
+				diff = 0;
 
-			var MAX_ENTER_ANIMATE = 5;
+			return function(e){
 
-			// create Timestamp objects
-			timestamps.forEach(this.add.bind(this));
+				diff = prevVal - window.scrollY;
+				top = top + diff;
+				prevVal = window.scrollY;
 
-			// if no timestamps, create a default one
-			if(timestamps.length === 0){
-				this.add({
-					model: {
-						name: "First launch of ToDone",
-						tags: ["awesome"]
-					},
-					display: 2
-				});
-			}
+				// console.log(top, prevVal, originalVal);
 
-			// attach to DOM and attach event listeners
-			this.timestamps.forEach(function(timestamp, i){
-				var max = i >= MAX_ENTER_ANIMATE ? true : false,
-					time = 150 * (max ? MAX_ENTER_ANIMATE : i);
+				// if completely hidden
+				if(top < -newTimestampHeight){
+					top = -newTimestampHeight;
 
-				setTimeout(function(){				
-					this.$el.append(timestamp.$el);
-					if(!max) timestamp.animate(".", "enter");
-				}.bind(this), time);
-			}.bind(this));
-		}
-
-		TimestampThread.prototype = {
-			constructor: TimestampThread,
-			add: function(timestamp){
-				timestamp.model = timestamp.model || {tags: []};
-
-				var ts = new Timestamp({
-					id: timestamp.id,
-					display: timestamp.display,
-					name: timestamp.model.name,
-					tags: timestamp.model.tags,
-					timestamp: timestamp.model.timestamp
-				});
-
-				ts.on("dirty", function(){
-					this.store();
-				}.bind(this));
-
-				ts.on("delete", function(timestamp){
-					var timestampIndex = this.timestamps.indexOf(timestamp);
-					if(~timestampIndex){
-						this.timestamps.splice(timestampIndex, 1);
-						this.store();
-					}
-				}.bind(this));
-
-				this.timestamps.unshift(ts);
-				this.store();
-				return ts;
-			},
-			// TODO - debounce!
-			store: function(){
-				var configs = this.fetch().configs,
-					timestamps = [];
-
-				this.timestamps.forEach(function(timestamp){
-					timestamps.push(timestamp.getParsable());
-				});
-
-				localStorage.ToDone = JSON.stringify({configs: configs, timestamps: timestamps});
-			},
-			fetch: function(){
-				if(!localStorage.ToDone){
-					store('{"configs": [], "timestamps": []}');
+				// if back at original position
+				}else if(top > originalTop){
+					top = originalTop;
 				}
-				return JSON.parse(localStorage.ToDone);
+
+				// if stickied and not in original position,
+				// add stickied class
+				if(prevVal !== originalVal && diff > 0){
+					$el.addClass("stickied");
+				} else {
+					$el.removeClass("stickied");
+				}
+
+				window.requestAnimationFrame(function(){
+					$el.css("top", top + "px");
+				});
 			}
-		};
+		})($("#newTimestamp"));*/
+
+		var scrollMug = (function($el, deadzone){
+			
+			var originalScrollPos = window.scrollY,
+				previousScrolPos = originalScrollPos,
+				elHeight = $el.outerHeight(),
+				originalElTop = parseInt($el.css("top")),
+				top = originalElTop,
+				diff = 0,
+				backAccumulation = 0;
+
+			return function(e){
+
+				diff = previousScrolPos - window.scrollY;
+				top = top + diff;
+				previousScrolPos = window.scrollY;
+
+				// if diff is positive, bring $el into view
+				if(diff > 0){
+
+					// if were at the top, show regardless
+					if(window.scrollY === originalScrollPos){
+						$el.css("top", originalElTop).removeClass("stickied");
+
+					// show only if we've moved backwards enough
+					} else if(backAccumulation > deadzone){
+						$el.css("top", originalElTop).addClass("stickied");
+					}
+
+					backAccumulation += diff;
+
+				// else, hide $el
+				} else {
+					backAccumulation = 0;
+					$el.css("top", -elHeight).removeClass("stickied");
+				}
+			}
+		})($("#newTimestamp"), 100);
+
+		// creates new timestamps in currently selected thread
+		// manages configs for new timestamps
+		function TimestampSpawner(){
+
+		}
 
 
 	</script>

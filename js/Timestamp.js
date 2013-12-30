@@ -30,7 +30,7 @@ window.Timestamp = (function(){
 		this.$el = $("<div class='datetime'></div>");
 		this.render();
 
-		this.autorefreshInterval = setInterval(this.render.bind(this), 1000);
+		// this.autorefreshInterval = setInterval(this.render.bind(this), 1000);
 	}
 
 	DatetimeView.prototype = {
@@ -60,7 +60,7 @@ window.Timestamp = (function(){
 		}
 	};
 
-	function Timestamp(config, animateIn){		
+	function Timestamp(config, animateIn){
 		var $datetimes;
 
 		config = config || {};
@@ -130,7 +130,7 @@ window.Timestamp = (function(){
 		render: function(){
 			this.$el.html(this.template(this));
 			return this.$el;
-		}, 
+		},
 		bindEvents: function(){
 			var func, selector, eventAction;
 
@@ -156,6 +156,11 @@ window.Timestamp = (function(){
 			return tagArr.join("");
 		},
 
+		// re-renders currently displayed datetime
+		rerenderDatetime: function(){
+			this.datetimes[this.display].render();
+		},
+
 		hideAllDatetimes: function(){
 			this.datetimes.forEach(function(datetime){
 				datetime.hide();
@@ -167,6 +172,7 @@ window.Timestamp = (function(){
 			this.display = this.display % NUM_DISPLAYS;
 			this.hideAllDatetimes();
 			this.datetimes[this.display].show();
+			this.rerenderDatetime();
 
 			this.store();
 		},
@@ -176,7 +182,7 @@ window.Timestamp = (function(){
 		updateName: function(){
 
 			// if already updating, dont try to update again
-			if(this.$el.find("header input").length) return;
+/*			if(this.$el.find("header").length) return;
 
 			var $input = $("<input type='text' value='"+ this.model.name +"'>");
 			this.$el.find("header").empty().append($input);
@@ -186,7 +192,22 @@ window.Timestamp = (function(){
 				this.$el.find("header").html(this.model.name);
 				this.store();
 			}.bind(this));
-			$input.on("submit", function(){alert("waha!");});
+			$input.on("submit", function(){alert("waha!");});*/
+
+
+			var $header = this.$el.find("header");
+			
+			// if already updating, dont try to update again
+			// if($header.prop("contenteditable")) return;
+
+			$header.prop("contenteditable", true).text(this.model.name).focus();
+
+			$header.on("blur change", function(e){
+				this.model.name = $header.text() || this.model.name;
+				$header.prop("contenteditable", false);
+				this.store();
+			}.bind(this));
+			$header.on("submit", function(){alert("waha!");});
 		},
 
 		// make tags editable
@@ -247,7 +268,7 @@ window.Timestamp = (function(){
 			this.emit("delete", this);
 			// TODO - cleaner/complete removal of dom element
 			this.$el.off();
-			this.animate("remove", null, function(){this.$el.remove();}.bind(this));				
+			this.animate("remove", null, function(){this.$el.remove();}.bind(this));
 		}
 	};
 
