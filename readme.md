@@ -23,12 +23,14 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 	* tapping tag populates filter box with that tag
 * make new timestamp box into a type
 	* create/load configs
+	* easy access to various configs from new timestamp card
 	* persist configs to localstorage
+	* make new timestamp card appear on swipe down, or at top of lsit
 * android-like notifications (toasts) (when item added, deleted, etc) with undo option
 * break out color stuff from other style for easy swapping of light/dark theme
 * dark theme - edit name input needs to be styled
 
-BUGS
+#BUGS
 
 # V2 stuff
 * optimize render() (request animation frame? synchronize all renders?)
@@ -39,7 +41,7 @@ BUGS
 * accurate to seconds instead of min
 * configurable colors?
 * hashtag routing
-* make localstorage methods not sucky
-* make Timestamp type store() trigger automatically with Timestamp property updates
 * export lists to text doc
 * sync across devices somehow? maybe export db?
+* icons for timestamps
+* compact view
