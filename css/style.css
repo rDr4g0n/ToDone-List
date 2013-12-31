@@ -40,7 +40,8 @@ header { display: block; }
 }
 /*.timestamp.enter { opacity: 0; -webkit-transform: scale(.25, 0); max-height: 0;}*/
 .timestamp.enter { -webkit-transform: translateX(-400px); max-height: 0;}
-.timestamp.remove { opacity: 0; -webkit-transform: translateX(-400px); max-height: 0;}
+.timestamp.remove { opacity: 0; -webkit-transform: translateX(-400px) !important; max-height: 0;}
+.timestamp.noAnim { -webkit-transition: none;  }
 
 .timestamp header { padding: 4px 30px 4px 8px; font-size: 1em; border-bottom: dotted #EEE 2px; color: #BF0252; }
 .timestamp header input { width: 100%; }
@@ -70,14 +71,14 @@ header { display: block; }
 .timestamp .tags.editable .tag .removeTag { display: inline; color: #BF0252; padding-right: 4px; }
 .timestamp .tags.editable .addTag { display: inline; }
 
-.newTimestamp { position: fixed !important; top: 0; left: 0; z-index: 10; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; max-height: 400px; -webkit-transform: translateY(45px);
+.newTimestamp { position: fixed !important; top: 0; left: 0; z-index: 10; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; max-height: 400px; -webkit-transform: translateY(40px);
 	-webkit-transition: -webkit-box-shadow .2s, top .5s, -webkit-transform .4s;
 }
-.newTimestamp.stickied { -webkit-box-shadow: 0 5px 15px 0 rgba(0,0,0,.5); }
+.newTimestamp.stickied { -webkit-box-shadow: 0 4px 10px 0 rgba(0,0,0,.65); }
 .newTimestamp.out { -webkit-transform: translateY(-75px); }
 
-select, input { font-family: inherit; font-size: inherit; color: inherit; outline: none; border: none;}
-select { -webkit-appearance: menulist-text; }
+select, input { font-family: inherit; font-size: inherit; background-color: transparent; color: inherit; outline: none; border: none;}
+select { -webkit-appearance: menulist-text; padding-right: 10px; background: url("arrow.png") center right no-repeat;}
 
 .dialogWrapper { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 100; background-color: rgba(0,0,0,.5); }
 .dialogWrapper.fade { background-color: rgba(0,0,0,0); }

@@ -62,15 +62,15 @@
 			<i class="fa fa-plus"></i> Add Timestamp
 		</div>
 		<div style="text-align: center; padding: 10px; ">
-			Preset: <select>
-				<option>Default</option>
-				<option>Feeding</option>
+			<select class="config">
+				<option value="default">Default Timestamp</option>
+				<option value="feeding">Feeding</option>
 			</select>
 		</div>
 	</div>
 
 
-	<div class="wrapper" style="margin-top: 150px;"></div>
+	<div class="wrapper" style="margin-top: 145px;"></div>
 
 	<script src="lib/jquery-2.0.3.min.js"></script>
 	<script src="lib/underscore.min.js"></script>
@@ -79,18 +79,8 @@
 	<script src="js/eventEmitter.js"></script>
 	<script src="js/Timestamp.js"></script>
 	<script src="js/TimestampThread.js"></script>
+	<script src="js/TimestampSpawner.js"></script>
 	<script>
-
-		// default config
-		// TODO - make this an array of configs that are
-		// 		saved/loaded from ls
-		var config = {
-			model: {
-				name: "New Timestamp",
-				tags: ["antibiotics", "feeding", "diaper change"]
-			},
-			display: 2
-		};
 
 		$(document).ready(function(){
 			// TODO - multiple timestampThreads
@@ -146,135 +136,6 @@
 			wrap.append(dialog);
 
 			$("body").append(wrap);*/
-		}
-		
-
-		// creates new timestamps in currently selected thread
-		// manages configs for new timestamps
-		function TimestampSpawner(timestampThread){
-			// TODO - template?
-			this.$el = $("#newTimestamp");
-			// TODO - center on page resize?
-			this.center();
-
-			// TODO - list of threads? currently focused thread?
-			this.timestampThread = timestampThread;
-
-			// TODO - use proper event map
-			this.$el.on("click", ".newTimestampIcon", this.addTimestamp.bind(this));
-			$(window).on("scroll", this.trackScroll.bind(this));
-
-			// this is used for trackScroll
-			this.originalScrollPos = window.scrollY;
-			this.previousScrollPos = window.scrollY;
-			this.diff = 0;
-			this.backAccumlation = 0;
-			this.DEADZONE = 100;
-		}
-
-		TimestampSpawner.prototype = {
-			constructor: TimestampSpawner,
-
-			// position and size new timestamp junk.
-			// HACK - fix this ugly crap
-			// 		get rid of magic numbers
-			center: function(){
-				var MAX_WIDTH = 400,
-					BODY_PADDING = 20,
-					bodyWidth = $("body").outerWidth(),
-					newTimestampWidth = bodyWidth - BODY_PADDING;
-
-				newTimestampWidth = newTimestampWidth > MAX_WIDTH ? MAX_WIDTH : newTimestampWidth;
-
-				this.$el.width(newTimestampWidth).css("margin-left", (bodyWidth * .5) - (newTimestampWidth * .5));
-			},
-
-			trackScroll: function(e){
-
-				this.diff = this.previousScrollPos - window.scrollY;
-				this.previousScrollPos = window.scrollY;
-
-				// if diff is positive, bring $el into view
-				if(this.diff > 0){
-
-					// if were at the top, show regardless
-					if(window.scrollY === this.originalScrollPos){
-						this.$el.removeClass("out").removeClass("stickied");
-
-					// show only if we've moved backwards enough
-					} else if(this.backAccumulation > this.DEADZONE){
-						this.$el.removeClass("out").addClass("stickied");
-					}
-
-					this.backAccumulation += this.diff;
-
-				// else, hide $el
-				} else {
-					this.backAccumulation = 0;
-					this.$el.addClass("out").removeClass("stickied");
-				}
-			},
-
-			show: function(){
-				// if were at the top, show without sticky
-				if(window.scrollY === this.originalScrollPos){
-					this.$el.removeClass("out").removeClass("stickied");
-
-				// otherwise, show with sticky
-				} else {
-					this.$el.removeClass("out").addClass("stickied");
-				}
-			},
-
-			addTimestamp: function(){
-				// TODO - select config based on select value
-				var timestamp = this.timestampThread.add(config);
-				// TODO - have timestampThread do the prepend/animate?
-				$(".wrapper").prepend(timestamp.$el);
-				timestamp.animate(null, "enter");
-			}
-
-			// this version doesnt perform well on mobile
-			// but is more accurate
-			/*
-			var scrollMug = (function($el){
-				var originalVal = window.scrollY,
-					prevVal = originalVal,
-					newTimestampHeight = $el.outerHeight(),
-					originalTop = parseInt($el.css("top")),
-					top = originalTop,
-					diff = 0;
-
-				return function(e){
-
-					diff = prevVal - window.scrollY;
-					top = top + diff;
-					prevVal = window.scrollY;
-
-					// console.log(top, prevVal, originalVal);
-
-					// if completely hidden
-					if(top < -newTimestampHeight){
-						top = -newTimestampHeight;
-
-					// if back at original position
-					}else if(top > originalTop){
-						top = originalTop;
-					}
-
-					// if stickied and not in original position,
-					// add stickied class
-					if(prevVal !== originalVal && diff > 0){
-						$el.addClass("stickied");
-					} else {
-						$el.removeClass("stickied");
-					}
-
-					window.requestAnimationFrame(function(){
-						$el.css("top", top + "px");
-					});
-				}
-			})($("#newTimestamp"));*/
 		}
 
 

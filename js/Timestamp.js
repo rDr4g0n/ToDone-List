@@ -82,13 +82,24 @@ window.Timestamp = (function(){
 		this.datetimeTemplates = datetimeTemplates;
 		this.datetimes = [];
 
+		// swipe to delete
+		// TODO - calculate threshold based on screen size?
+		this.SWIPE_TO_DELETE_THRESHOLD = 250;
+		this.previousSwipeX = 0;
+		this.swipeAccumulation = 0;
+		this.translateX = 0;
+
 		this.eventMap = {
 			"click header": "updateName",
 			"click .tagIcon": "editTags",
 			"click .removeTag": "removeTag",
 			"click .addTag": "addTag",
 			"click .datetimes": "showNextDisplay",
-			"click .edit": "del"
+			"click .edit": "del",
+			"touchstart": "touchstart",
+			"touchmove": "touchmove",
+			"touchend": "touchend",
+			"touchcancel": "touchcancel"
 		};
 	
 		eventEmitter.call(this);
@@ -239,18 +250,61 @@ window.Timestamp = (function(){
 			};
 		},
 
+		touchstart: function(e){
+			this.$el.addClass("noAnim");
+		},
+
+		touchend: function(e){
+			this.$el.removeClass("noAnim");
+
+			if(this.swipeDel){
+				this.del();
+			} else {
+				this.$el.css({"-webkit-transform": "translateX(0px)", "opacity": 1});
+			}
+
+			this.previousSwipeX = null;
+			this.translateX = this.swipeAccumulation = 0;
+		},
+		touchcancel: function(e){
+			e.preventDefault();
+		},
+
+		touchmove: function(e){
+			e.preventDefault();
+
+			if(!this.previousSwipeX) this.previousSwipeX = e.originalEvent.changedTouches[0].clientX;
+
+			var touchX = e.originalEvent.changedTouches[0].clientX,
+				diff = this.previousSwipeX - touchX;
+
+			this.previousSwipeX = touchX;
+			this.swipeAccumulation -= diff;
+			this.translateX -= diff;
+
+			this.$el.css({"-webkit-transform": "translateX("+ this.translateX +"px)", "opacity": this.swipeOpacityEase(this.translateX)});
+
+			if(Math.abs(this.swipeAccumulation) > this.SWIPE_TO_DELETE_THRESHOLD){
+				this.swipeDel = true;
+			} else {
+				this.swipeDel = false;
+			}
+		},
+
+		// calculates opacity based on how far swiped the
+		// element being swiped is
+		// TODO - non-linear ease
+		// TODO - clamp value
+		swipeOpacityEase: function(val){
+			return 1 - (Math.abs(val) / this.SWIPE_TO_DELETE_THRESHOLD);
+		},
+
 		// store in localstorage anytime model or config changes
 		store: function(){
-/*			ls.set({
-				id: this.id,
-				display: this.display,
-				model: this.model
-			});*/
 			this.emit("dirty");
 		},
 
 		del: function(){
-			// ls.remove(this.id);
 			this.emit("delete", this);
 			// TODO - cleaner/complete removal of dom element
 			this.$el.off();

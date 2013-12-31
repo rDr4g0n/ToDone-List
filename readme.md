@@ -21,11 +21,11 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 	* filter by name
 	* tapping tag populates filter box with that tag
 * make new timestamp box into a type
-	* create/load configs
-	* easy access to various configs from new timestamp card
-	* persist configs to localstorage
+	* create configs
+	* store/retrieve configs from localstorage
 * android-like notifications (toasts) (when item added, deleted, etc) with undo option
 * swipe to delete
+	* swipe right/animate out right
 * undelete
 * icon and color settings per config
 * make tag delete `x` bigger
