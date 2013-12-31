@@ -42,7 +42,8 @@ header { display: block; }
 .timestamp.enter { -webkit-transform: translateX(-400px); max-height: 0;}
 .timestamp.remove { opacity: 0; -webkit-transform: translateX(-400px); max-height: 0;}
 
-.timestamp header { padding: 4px 8px; font-size: 1em; border-bottom: dotted #EEE 2px; color: #BF0252; }
+.timestamp header { padding: 4px 30px 4px 8px; font-size: 1em; border-bottom: dotted #EEE 2px; color: #BF0252; }
+.timestamp header input { width: 100%; }
 
 .timestamp .datetimes { }
 .timestamp .datetime { height: 90px; position: absolute; width: 300px; display: none; -webkit-transition: all ease-in-out .2s; opacity: 1; }
@@ -71,13 +72,13 @@ header { display: block; }
 
 
 .newTimestamp { position: fixed !important; top: 45px; left: 0; z-index: 10;
-	-webkit-transition: -webkit-box-shadow .2s, top .3s !important;
+	-webkit-transition: -webkit-box-shadow .2s, top .5s, opacity .2s !important;
 }
 .newTimestamp.stickied { -webkit-box-shadow: 0 5px 15px 0 rgba(0,0,0,.5); }
+.newTimestamp.out { top: -65px; opacity: 0; }
 
 select, input { font-family: inherit; font-size: inherit; color: inherit; outline: none; border: none;}
 select { -webkit-appearance: menulist-text; }
-::selection { background: pink; color: pink;}
 
 .dialogWrapper { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 100; background-color: rgba(0,0,0,.5); }
 .dialogWrapper.fade { background-color: rgba(0,0,0,0); }

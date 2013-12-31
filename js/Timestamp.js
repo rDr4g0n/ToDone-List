@@ -182,7 +182,7 @@ window.Timestamp = (function(){
 		updateName: function(){
 
 			// if already updating, dont try to update again
-/*			if(this.$el.find("header").length) return;
+			if(this.$el.find("header input").length) return;
 
 			var $input = $("<input type='text' value='"+ this.model.name +"'>");
 			this.$el.find("header").empty().append($input);
@@ -192,22 +192,8 @@ window.Timestamp = (function(){
 				this.$el.find("header").html(this.model.name);
 				this.store();
 			}.bind(this));
-			$input.on("submit", function(){alert("waha!");});*/
 
-
-			var $header = this.$el.find("header");
-			
-			// if already updating, dont try to update again
-			// if($header.prop("contenteditable")) return;
-
-			$header.prop("contenteditable", true).text(this.model.name).focus();
-
-			$header.on("blur change", function(e){
-				this.model.name = $header.text() || this.model.name;
-				$header.prop("contenteditable", false);
-				this.store();
-			}.bind(this));
-			$header.on("submit", function(){alert("waha!");});
+			// TODO - hide menu icon and add checkmark/save icon 
 		},
 
 		// make tags editable
