@@ -149,6 +149,9 @@ window.TimestampSpawner = (function(){
 			this.currConfig = _.find(this.configs, function(obj){
 				return obj.configName === val;
 			});
+
+			// TODO - this seems like a hack...
+			this.addTimestamp();
 		}
 
 		// this version doesnt perform well on mobile

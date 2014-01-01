@@ -67,6 +67,8 @@ window.Timestamp = (function(){
 
 		this.id = config.id || uuid();
 
+		this.deleted = config.deleted || false;
+
 		// TODO - use set function on model
 		// 	and debounce updates to store
 		this.model = {};
@@ -84,18 +86,24 @@ window.Timestamp = (function(){
 
 		// swipe to delete
 		// TODO - calculate threshold based on screen size?
-		this.SWIPE_TO_DELETE_THRESHOLD = 250;
+		// this.SWIPE_TO_DELETE_THRESHOLD = 250;
+		this.SWIPE_TO_DELETE_THRESHOLD = Math.min($("body").outerWidth() * 0.5, 200);
 		this.previousSwipeX = 0;
 		this.swipeAccumulation = 0;
 		this.translateX = 0;
+		this.touchstartTime = null;
+		this.SWIPE_DURATION_THRESHOLD = 250;
+		this.SWIPE_VS_SCROLL_THRESHOLD = 7;
 
 		this.eventMap = {
-			"click header": "updateName",
+			"click header": "editName",
+			"change header input": "updateName",
+			"blur header input": "updateName",
 			"click .tagIcon": "editTags",
 			"click .removeTag": "removeTag",
 			"click .addTag": "addTag",
 			"click .datetimes": "showNextDisplay",
-			"click .edit": "del",
+			"click .edit": function(){this.del();}.bind(this),
 			"touchstart": "touchstart",
 			"touchmove": "touchmove",
 			"touchend": "touchend",
@@ -161,7 +169,7 @@ window.Timestamp = (function(){
 		renderTags: function(){
 			var tagArr = [];
 			this.model.tags.forEach(function(tag){
-				tagArr.push('<li class="tag" data-name="'+ tag +'"><i class="fa fa-times removeTag"></i>');
+				tagArr.push('<li class="tag" data-name="'+ tag +'"><i class="fa fa-times fa-lg removeTag"></i>');
 				tagArr.push('<a href="#/'+ tag +'">'+ tag +'</a></li>');
 			});
 			return tagArr.join("");
@@ -190,7 +198,7 @@ window.Timestamp = (function(){
 
 		// convert name field to an input and focus it
 		// so the user can update name
-		updateName: function(){
+		editName: function(){
 
 			// if already updating, dont try to update again
 			if(this.$el.find("header input").length) return;
@@ -198,13 +206,18 @@ window.Timestamp = (function(){
 			var $input = $("<input type='text' value='"+ this.model.name +"'>");
 			this.$el.find("header").empty().append($input);
 			$input.focus();
-			$input.on("blur change", function(e){
-				this.model.name = $input.val() || this.model.name;
-				this.$el.find("header").html(this.model.name);
-				this.store();
-			}.bind(this));
 
-			// TODO - hide menu icon and add checkmark/save icon 
+			this.$el.find(".edit").hide();
+			this.$el.find(".confirm").show();
+		},
+
+		updateName: function(){
+			this.model.name = this.$el.find("header input").val() || this.model.name;
+			this.$el.find("header").html(this.model.name);
+			this.store();
+
+			this.$el.find(".edit").show();
+			this.$el.find(".confirm").hide();
 		},
 
 		// make tags editable
@@ -246,19 +259,30 @@ window.Timestamp = (function(){
 			return {
 				id: this.id,
 				display: this.display,
-				model: this.model
+				model: this.model,
+				deleted: this.deleted
 			};
 		},
 
 		touchstart: function(e){
+			this.touchstartTime = new Date().getTime();
+			this.previousSwipeX = e.originalEvent.changedTouches[0].clientX;
 			this.$el.addClass("noAnim");
 		},
 
 		touchend: function(e){
+
+			// if this was a swipe, dont perform default
+			// touchend action
+			if(new Date().getTime() - this.touchstartTime > this.SWIPE_DURATION_THRESHOLD){
+				console.log("preventing default");
+				e.preventDefault();
+			}
+
 			this.$el.removeClass("noAnim");
 
 			if(this.swipeDel){
-				this.del();
+				this.del(this.swipeDel);
 			} else {
 				this.$el.css({"-webkit-transform": "translateX(0px)", "opacity": 1});
 			}
@@ -268,15 +292,22 @@ window.Timestamp = (function(){
 		},
 		touchcancel: function(e){
 			e.preventDefault();
+			console.log("cancelling");
 		},
 
 		touchmove: function(e){
-			e.preventDefault();
-
-			if(!this.previousSwipeX) this.previousSwipeX = e.originalEvent.changedTouches[0].clientX;
 
 			var touchX = e.originalEvent.changedTouches[0].clientX,
 				diff = this.previousSwipeX - touchX;
+
+			// as soon as scroll begins, touchmove is cancelled,
+			// so you basically have a single touchmove to either
+			// preventDefault, thus disabling scroll, or not 
+			// preventDefault, thus enabling scroll and disabling custom
+			// touchmove stuff
+			if(Math.abs(diff) < this.SWIPE_VS_SCROLL_THRESHOLD) return;
+
+			e.preventDefault();
 
 			this.previousSwipeX = touchX;
 			this.swipeAccumulation -= diff;
@@ -285,7 +316,11 @@ window.Timestamp = (function(){
 			this.$el.css({"-webkit-transform": "translateX("+ this.translateX +"px)", "opacity": this.swipeOpacityEase(this.translateX)});
 
 			if(Math.abs(this.swipeAccumulation) > this.SWIPE_TO_DELETE_THRESHOLD){
-				this.swipeDel = true;
+				if(this.swipeAccumulation > 0){
+					this.swipeDel = "right";
+				} else {
+					this.swipeDel = "left";
+				}
 			} else {
 				this.swipeDel = false;
 			}
@@ -293,10 +328,8 @@ window.Timestamp = (function(){
 
 		// calculates opacity based on how far swiped the
 		// element being swiped is
-		// TODO - non-linear ease
-		// TODO - clamp value
-		swipeOpacityEase: function(val){
-			return 1 - (Math.abs(val) / this.SWIPE_TO_DELETE_THRESHOLD);
+		swipeOpacityEase: function(x){
+			return Math.max(1 - (Math.abs(x) / this.SWIPE_TO_DELETE_THRESHOLD), .4);
 		},
 
 		// store in localstorage anytime model or config changes
@@ -304,11 +337,19 @@ window.Timestamp = (function(){
 			this.emit("dirty");
 		},
 
-		del: function(){
+		del: function(dir){
+			dir = dir || "left";
+			this.deleted = true;
+			this.store();
 			this.emit("delete", this);
 			// TODO - cleaner/complete removal of dom element
 			this.$el.off();
-			this.animate("remove", null, function(){this.$el.remove();}.bind(this));
+			this.animate("remove " + dir, null, function(){this.$el.remove();}.bind(this));
+		},
+
+		undelete: function(){
+			this.deleted = false;
+			this.store();
 		}
 	};
 

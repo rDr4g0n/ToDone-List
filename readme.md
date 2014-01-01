@@ -23,19 +23,15 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 * make new timestamp box into a type
 	* create configs
 	* store/retrieve configs from localstorage
-* android-like notifications (toasts) (when item added, deleted, etc) with undo option
-* swipe to delete
-	* swipe right/animate out right
-* undelete
 * icon and color settings per config
-* make tag delete `x` bigger
 * break out color stuff from other style for easy swapping of light/dark theme
-* dark theme - edit name input needs to be styled
-* dark theme - new timestamp box needs to be styled
-* on edit of timestamp name, hide menu icon, add checkbox/commit icon
+* add way to flush deleted timestamps
+* cancel icon when editing name?
 
 #BUGS
-* new timestamp card positioning doesnt account for scrollbar width
+* new timestamp card position can be off by scrollbar width in some cases
+* swipe to delete kills scrolling :/
+* remove tag x doesnt fill vertical space of tag
 
 # V2 stuff
 * optimize render() (request animation frame? synchronize all renders?)

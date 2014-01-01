@@ -35,12 +35,16 @@ header { display: block; }
 
 .wrapper { margin: 0 auto 10px auto; max-width: 400px; }
 
-.timestamp{ position: relative; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; max-height: 400px; -webkit-transform: scale(1, 1) translateY(0) translateX(0); -webkit-transform-origin: 50% 0%;
+.timestamp{ position: relative; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; opacity: 1; max-height: 400px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-webkit-transform: scale(1, 1) translateY(0) translateX(0); -webkit-transform-origin: 50% 0%;
 	-webkit-transition: opacity .35s, -webkit-transform .25s, max-height ease-out .35s; 
 }
-/*.timestamp.enter { opacity: 0; -webkit-transform: scale(.25, 0); max-height: 0;}*/
 .timestamp.enter { -webkit-transform: translateX(-400px); max-height: 0;}
-.timestamp.remove { opacity: 0; -webkit-transform: translateX(-400px) !important; max-height: 0;}
+.timestamp.remove { opacity: 0; max-height: 0;}
+.timestamp.remove.left { -webkit-transform: translateX(-400px) !important; }
+.timestamp.remove.right { -webkit-transform: translateX(400px) !important; }
 .timestamp.noAnim { -webkit-transition: none;  }
 
 .timestamp header { padding: 4px 30px 4px 8px; font-size: 1em; border-bottom: dotted #EEE 2px; color: #BF0252; }
@@ -56,26 +60,27 @@ header { display: block; }
 .timestamp .datetime .small { margin: -10px 0 7px 8px; color: #999;}
 .timestamp .datetime .soopa { vertical-align: super; font-size: .5em; letter-spacing: 0; padding-left: 4px; }
 
-.timestamp .edit { position: absolute; top: 8px; right: 5px; cursor: pointer; color: #CCC;}
-.timestamp .edit:active { color: #999; }
+.timestamp .edit, .timestamp .confirm { position: absolute; top: 8px; right: 5px; color: #CCC;}
+.timestamp .edit:active, .timestamp .confirm { color: #999; }
 
 .timestamp .tags { position: relative; padding: 6px 8px 2px 8px; font-size: .8em; border-top: dotted #EEE 2px; margin-top: 90px; color: #BF0252; } 
 .timestamp .tags .tagIcon { padding-right: 4px; display: inline-block; }
-.timestamp .tags .tag { display: inline-block; background-color: #DDD; margin: 0 2px 4px 2px; padding: 2px 6px; border-radius: 4px; }
-.timestamp .tags .tag a { color: #BF0252; text-decoration: none; }
+.timestamp .tags .tag { display: inline-block; background-color: #DDD; margin: 0 2px 4px 2px; border-radius: 4px; }
+.timestamp .tags .tag a { display: inline-block; color: #BF0252; text-decoration: none; margin: 2px 6px; }
 .timestamp .tags .tag:active { color: #BF0252;}
-.timestamp .tags .tag .removeTag { display: none; color: #BF0252; padding-right: 4px; }
+.timestamp .tags .tag .removeTag { display: none; background-color: #BF0252; color: white; padding: 0 4px; border-radius: 4px 0 0 4px; }
 .timestamp .tags .addTag { display: none; color: #BF0252; }
 
 .timestamp .tags.editable .tagIcon { color: #BF0252; }
-.timestamp .tags.editable .tag .removeTag { display: inline; color: #BF0252; padding-right: 4px; }
+.timestamp .tags.editable .tag .removeTag { display: inline; }
 .timestamp .tags.editable .addTag { display: inline; }
 
-.newTimestamp { position: fixed !important; top: 0; left: 0; z-index: 10; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; max-height: 400px; -webkit-transform: translateY(40px);
+.newTimestamp { position: fixed !important; top: 0; left: 0; z-index: 10; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; -webkit-transform: translateY(40px);
 	-webkit-transition: -webkit-box-shadow .2s, top .5s, -webkit-transform .4s;
 }
 .newTimestamp.stickied { -webkit-box-shadow: 0 4px 10px 0 rgba(0,0,0,.65); }
 .newTimestamp.out { -webkit-transform: translateY(-75px); }
+.newTimestamp .newTimestampIcon { text-align: center; padding: 10px; font-size: 1.2em; border-bottom: dotted 2px #EEE; color: #BF0252; }
 
 select, input { font-family: inherit; font-size: inherit; background-color: transparent; color: inherit; outline: none; border: none;}
 select { -webkit-appearance: menulist-text; padding-right: 10px; background: url("arrow.png") center right no-repeat;}
@@ -84,6 +89,11 @@ select { -webkit-appearance: menulist-text; padding-right: 10px; background: url
 .dialogWrapper.fade { background-color: rgba(0,0,0,0); }
 .dialog { width: 85%; height: 85%; position: absolute; top: 7%; left: 7%; z-index: 101; background-color: white; -webkit-transform: scale(1,1); opacity: 1; }
 .dialog.zoom { -webkit-transform: scale(.5,.5); opacity: 0; }
+
+.toast { position: absolute; bottom: 50px; left: 50px; padding: 5px 10px; color: #DDD; background-color: rgba(0,0,0,.75); border-radius: 2px; -webkit-transition: opacity .3s;}
+.toast.hide { opacity: 0; }
+.toast a { color: white; padding: 0 5px; }
+.toast i { padding: 0 5px; }
 
 body.dark { background: #212121; }
 .dark .actionBar a { color: white; }
@@ -97,5 +107,7 @@ body.dark { background: #212121; }
 .dark .timestamp .tags .addTag { color: white; }
 .dark .timestamp .tags .tag .removeTag { color: white; }
 .dark .timestamp .tags.editable .tagIcon { color: white; }
-.dark .timestamp .tags.editable .tag .removeTag { display: inline; color: white; padding-right: 4px; }
+.dark .timestamp .tags.editable .tag .removeTag { display: inline; background-color: white; color: #3d3d3d; padding-right: 4px; }
 .dark .actionBar { background-color: #333; border-bottom-color: #1F1F1F; border-top-color: #1F1F1F; color: white; }
+.dark .newTimestamp { background-color: #353535; border-bottom-color: black; color: #888; }
+.dark .newTimestamp .newTimestampIcon { border-bottom-color: #3d3d3d; color: #888; }

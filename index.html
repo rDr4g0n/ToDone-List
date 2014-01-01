@@ -7,7 +7,7 @@
 	<link href="css/font-awesome.min.css" rel="stylesheet">
 	<link href="css/style.css" rel="stylesheet">
 </head>
-<body class="">
+<body class="dark">
 
 	<script type="text/x-underscore-template" id="timestampTemplate">
 
@@ -18,10 +18,11 @@
 		<ul class="tags">
 			<li class="tagIcon"><i class="fa fa-tags"></i></li>
 			<%= renderTags() %>
-			<li class="addTag"><i class="fa fa-plus-square fa-lg"></i></li>
+			<li class="addTag"><i class="fa fa-plus fa-lg"></i></li>
 		</ul>
 
 		<i class="fa fa-ellipsis-v fa-fw edit"></i>
+		<i class="fa fa-check fa-fw confirm" style="display:none;"></i>
 
 	</script>
 
@@ -58,7 +59,7 @@
 	</header>
 
 	<div id="newTimestamp" class="newTimestamp">
-		<div class="newTimestampIcon" style="text-align: center; padding: 10px; font-size: 1.2em; border-bottom: dotted 2px #EEE; color: #BF0252;">
+		<div class="newTimestampIcon">
 			<i class="fa fa-plus"></i> Add Timestamp
 		</div>
 		<div style="text-align: center; padding: 10px; ">
@@ -101,7 +102,7 @@
 			var start = opts.start,
 				stop = opts.stop,
 				cb = opts.callback,
-				cssAnims = opts.cssAnims;
+				cssAnims = opts.cssAnims || {};
 
 			// TODO - return false if required options are absent
 
@@ -129,13 +130,28 @@
 			localStorage.ToDone = '{"configs": [], "timestamps": []}';
 		}
 
-		function popDialog(){
-			/*var wrap = $("<div class='dialogWrapper'></div>"),
-				dialog = $("<div class='dialog'>asdf</div>");
 
-			wrap.append(dialog);
+		function toast(msg, clickFunc){
+			clickFunc = clickFunc || function(){};
 
-			$("body").append(wrap);*/
+			var $toast = $("<div class='toast'>"+ msg +"</div>");
+
+			// TODO - event map instead of single click function
+			$toast.on("click", clickFunc);
+
+			// TODO - stack toasts instead of removing
+			$("body").find(".toast").remove();
+
+			$("body").append($toast);
+
+			$toast.css("left", ($("body").outerWidth() * 0.5) - ($toast.outerWidth() * 0.5) +"px");
+
+			cssAnimate($toast, {start: "hide"});
+			setTimeout(function(){
+				cssAnimate($toast, {stop: "hide", callback: function(){
+					$toast.remove();
+				}});
+			}, 2000);
 		}
 
 
