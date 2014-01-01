@@ -153,48 +153,6 @@ window.TimestampSpawner = (function(){
 			// TODO - this seems like a hack...
 			this.addTimestamp();
 		}
-
-		// this version doesnt perform well on mobile
-		// but is more accurate
-		/*
-		var scrollMug = (function($el){
-			var originalVal = window.scrollY,
-				prevVal = originalVal,
-				newTimestampHeight = $el.outerHeight(),
-				originalTop = parseInt($el.css("top")),
-				top = originalTop,
-				diff = 0;
-
-			return function(e){
-
-				diff = prevVal - window.scrollY;
-				top = top + diff;
-				prevVal = window.scrollY;
-
-				// console.log(top, prevVal, originalVal);
-
-				// if completely hidden
-				if(top < -newTimestampHeight){
-					top = -newTimestampHeight;
-
-				// if back at original position
-				}else if(top > originalTop){
-					top = originalTop;
-				}
-
-				// if stickied and not in original position,
-				// add stickied class
-				if(prevVal !== originalVal && diff > 0){
-					$el.addClass("stickied");
-				} else {
-					$el.removeClass("stickied");
-				}
-
-				window.requestAnimationFrame(function(){
-					$el.css("top", top + "px");
-				});
-			}
-		})($("#newTimestamp"));*/
 	};
 
 	return TimestampSpawner;

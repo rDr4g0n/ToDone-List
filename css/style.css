@@ -95,6 +95,18 @@ select { -webkit-appearance: menulist-text; padding-right: 10px; background: url
 .toast a { color: white; padding: 0 5px; }
 .toast i { padding: 0 5px; }
 
+.pane { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1000; background-color: #EEE; 
+	opacity: 1; -webkit-transform: scale(1, 1);
+	-webkit-transition: opacity .2s, -webkit-transform ease-out .2s;
+}
+.pane.enter { opacity: 0; -webkit-transform: scale(.7, .7); }
+.pane .paneItems { width: 100%; height: 100%; font-size: 1.1em; margin-top: 45px; }
+.pane .paneItems li { padding: 15px; border-bottom: solid 1px #DDD;}
+.pane .paneItems li.header { padding: 5px 15px; font-size: .8em; font-weight: bold; border-bottom: solid 1px #AAA; color: #AAA; text-transform: uppercase;}
+.pane .paneItems li:last-child { border-bottom: none; }
+.pane .paneItems li .sub { display: block; color: #AAA; font-size: .8em; }
+.pane .paneItems li .control { float: right; }
+
 body.dark { background: #212121; }
 .dark .actionBar a { color: white; }
 .dark .timestamp { background-color: #353535; border-bottom-color: black; color: #888;}

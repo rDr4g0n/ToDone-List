@@ -7,7 +7,7 @@
 	<link href="css/font-awesome.min.css" rel="stylesheet">
 	<link href="css/style.css" rel="stylesheet">
 </head>
-<body class="dark">
+<body class="">
 
 	<script type="text/x-underscore-template" id="timestampTemplate">
 
@@ -53,8 +53,31 @@
 		</div>
 	</script>
 
+	<script type="text/x-underscore-template" id="settingsPane">
+		<header class="actionBar">				
+			<span style="margin:8px;" class="appIcon">
+				<i class="fa fa-chevron-left" style="padding-left: 4px;"></i>
+				<i class="fa fa-check-square-o fa-lg"></i>
+				Settings
+			</span>
+		</header>
+		<div class="paneItems">
+			<ul>
+				<li class="header">General</li>
+				<li>Clear archived timestamps</li>
+				<li>Clear all timestamps <span class="sub">This cannot be undone!</span></li>
+				<li>Night Theme <span class="control"><input type="checkbox"></span></li>
+			</ul>
+			<ul>
+				<li class="header">Contact</li>
+				<li>Contact my balls</li>
+			</ul>
+		</div>
+	</script>
+
 	<header class="actionBar">
 		<span style="margin:8px;"><i class="fa fa-check-square-o fa-lg"></i> ToDone</span>
+		<a href="#" style="float:right;" class=""><i class="fa fa-cog fa-fw fa-2x options"></i></a>
 		<a href="#" style="float:right;" class=""><i class="fa fa-search fa-2x"></i></a>
 	</header>
 
@@ -87,6 +110,10 @@
 			// TODO - multiple timestampThreads
 			var timestampThread = new TimestampThread(ls.get().timestamps.reverse() || [], $(".wrapper"));
 			new TimestampSpawner(timestampThread);
+
+			$(".options").on("click", function(){
+				popPane($("#settingsPane").html());
+			});
 		});
 
 		function uuid() {
@@ -152,6 +179,18 @@
 					$toast.remove();
 				}});
 			}, 2000);
+		}
+
+		function popPane(template){
+			// TODO - make back button navigate back
+			var $pane = $("<div class='pane'>"+ template +"</div>");
+			$pane.find(".appIcon").on("click", function(){
+				cssAnimate($pane, {stop: "enter", callback: function(){
+					$pane.remove();
+				}});
+			});
+			$("body").append($pane);
+			cssAnimate($pane, {start: "enter"});
 		}
 
 
