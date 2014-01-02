@@ -43,7 +43,7 @@ window.TimestampThread = (function(){
 		constructor: TimestampThread,
 		add: function(timestamp){
 
-			if(timestamp.deleted) return;
+			if(timestamp.archived) return;
 
 			timestamp.model = timestamp.model || {tags: []};
 
@@ -59,7 +59,7 @@ window.TimestampThread = (function(){
 				this.store();
 			}.bind(this));
 
-			ts.on("delete", function(timestamp){
+			ts.on("archive", function(timestamp){
 				// this actually removes the timestamp from localstorage
 				/*var timestampIndex = this.timestamps.indexOf(timestamp);
 				if(~timestampIndex){
@@ -68,8 +68,8 @@ window.TimestampThread = (function(){
 				}*/
 
 				// TODO - toast with undo option
-				toast("Deleted <a href='#'><i class='fa fa-undo'></i>Undo</a>", function(){
-					timestamp.undelete();
+				toast("Archived <a href='#'><i class='fa fa-undo'></i>Undo</a>", function(){
+					timestamp.unarchive();
 					// TODO - reinsert timestamp.$el into DOM
 					toast("Undid! Yay!");
 				});

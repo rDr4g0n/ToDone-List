@@ -67,7 +67,7 @@ window.Timestamp = (function(){
 
 		this.id = config.id || uuid();
 
-		this.deleted = config.deleted || false;
+		this.archived = config.archived || false;
 
 		// TODO - use set function on model
 		// 	and debounce updates to store
@@ -84,7 +84,7 @@ window.Timestamp = (function(){
 		this.datetimeTemplates = datetimeTemplates;
 		this.datetimes = [];
 
-		// swipe to delete
+		// swipe to archive
 		// TODO - calculate threshold based on screen size?
 		// this.SWIPE_TO_DELETE_THRESHOLD = 250;
 		this.SWIPE_TO_DELETE_THRESHOLD = Math.min($("body").outerWidth() * 0.5, 200);
@@ -103,7 +103,7 @@ window.Timestamp = (function(){
 			"click .removeTag": "removeTag",
 			"click .addTag": "addTag",
 			"click .datetimes": "showNextDisplay",
-			"click .edit": function(){this.del();}.bind(this),
+			"click .edit": function(){this.archive();}.bind(this),
 			"touchstart": "touchstart",
 			"touchmove": "touchmove",
 			"touchend": "touchend",
@@ -260,7 +260,7 @@ window.Timestamp = (function(){
 				id: this.id,
 				display: this.display,
 				model: this.model,
-				deleted: this.deleted
+				archived: this.archived
 			};
 		},
 
@@ -282,7 +282,7 @@ window.Timestamp = (function(){
 			this.$el.removeClass("noAnim");
 
 			if(this.swipeDel){
-				this.del(this.swipeDel);
+				this.archive(this.swipeDel);
 			} else {
 				this.$el.css({"-webkit-transform": "translateX(0px)", "opacity": 1});
 			}
@@ -337,18 +337,18 @@ window.Timestamp = (function(){
 			this.emit("dirty");
 		},
 
-		del: function(dir){
+		archive: function(dir){
 			dir = dir || "left";
-			this.deleted = true;
+			this.archived = true;
 			this.store();
-			this.emit("delete", this);
+			this.emit("archive", this);
 			// TODO - cleaner/complete removal of dom element
 			this.$el.off();
 			this.animate("remove " + dir, null, function(){this.$el.remove();}.bind(this));
 		},
 
-		undelete: function(){
-			this.deleted = false;
+		unarchive: function(){
+			this.archived = false;
 			this.store();
 		}
 	};
