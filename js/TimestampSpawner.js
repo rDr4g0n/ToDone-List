@@ -1,18 +1,22 @@
 // creates new timestamps in currently selected thread
-// manages configs for new timestamps
+// manages presets for new timestamps
 window.TimestampSpawner = (function(){
 
 	function TimestampSpawner(timestampThread){
 		// TODO - use template and this.render()
-		this.$el = $("#newTimestamp");
+		this.template = _.template($("#newTimestampTemplate").html());
+		this.$el = $('<div id="newTimestamp" class="newTimestamp">');
+		this.render();
 		this.center();
 
 		// TODO - list of threads? currently focused thread?
 		this.timestampThread = timestampThread;
 
 		this.eventMap = {
-			"click .newTimestampIcon": "addTimestamp",
-			"change .config": "updateCurrConfig"
+			"click .plusIcon": "addTimestamp",
+			"click .presetName": "showPresets",
+			"change .preset": function(){this.updateCurrPreset(); this.addTimestamp();},
+			"click .edit": "presetOptions"
 		};
 
 		$(window).on("scroll", this.trackScroll.bind(this));
@@ -25,35 +29,57 @@ window.TimestampSpawner = (function(){
 		this.backAccumlation = 0;
 		this.DEADZONE = 100;
 
-		// TODO - load configs from localstorage
-		this.configs = [
+		// TODO - load presets from localstorage
+		/*this.presets = [
 			{
-				configName: "default",
+				presetName: "default",
 				model: {
 					name: "New Timestamp",
 					tags: []
 				},
 				display: 2
 			},{
-				configName: "feeding",
+				presetName: "feeding",
 				model: {
 					name: "Feeding",
 					tags: ["milk", "feeding"]
 				},
 				display: 1
 			},{
-				configName: "Took a dump",
+				presetName: "Took a dump",
 				model: {
 					name: "made a dookie",
 					tags: ["poop", "number 2"]
 				},
 				display: 2
 			}
-		];
+		];*/
 
-		this.$el.find(".config").html(this.generateConfigOptions());
-		// TODO - store default config?
-		this.currConfig = this.configs[0];
+		this.presets = ls.get().presets;
+		if(!this.presets.length){
+			this.presets.push({
+				presetName: "default",
+				model: {
+					name: "New Timestamp",
+					tags: []
+				},
+				display: 2
+			},{
+				presetName: "potty",
+				model: {
+					name: "I went potty",
+					tags: ["potty", "number 1"]
+				},
+				display: 2
+			});
+			// TODO - store to ls
+		}
+
+		this.$el.find(".preset").html(this.generatePresetOptions());
+		// TODO - store default preset?
+		this.currPreset = this.presets[0];
+		// show currently selected preset
+		this.updateCurrPreset();
 
 		this.bindEvents();
 	}
@@ -129,29 +155,39 @@ window.TimestampSpawner = (function(){
 		},
 
 		addTimestamp: function(){
-			var	timestamp = this.timestampThread.add(this.currConfig);
+			var	timestamp = this.timestampThread.add(this.currPreset);
 
 			// TODO - have timestampThread do the prepend/animate?
 			$(".wrapper").prepend(timestamp.$el);
 			timestamp.animate(null, "enter");
 		},
 
-		generateConfigOptions: function(){
+		generatePresetOptions: function(){
 			var opts = [];
-			this.configs.forEach(function(config){
-				opts.push("<option value='"+ config.configName +"'>"+ config.configName +"</option>");
+			this.presets.forEach(function(preset){
+				opts.push("<option value='"+ preset.presetName +"'>"+ preset.presetName +"</option>");
 			});
 			return opts.join("");
 		},
 
-		updateCurrConfig: function(e){
-			var val = $(e.currentTarget).val();
-			this.currConfig = _.find(this.configs, function(obj){
-				return obj.configName === val;
+		// TODO - separate html modification from model modification
+		updateCurrPreset: function(){
+			var val = this.$el.find(".preset").val();
+			this.currPreset = _.find(this.presets, function(obj){
+				return obj.presetName === val;
 			});
+			this.$el.find(".presetName").html(this.currPreset.presetName +' <i class="fa fa-angle-down"></i>');
 
 			// TODO - this seems like a hack...
-			this.addTimestamp();
+			// this.addTimestamp();
+		},
+
+		showPresets: function(){
+			this.$el.find(".preset").trigger("click");
+		},
+
+		presetOptions: function(){
+			popPane($("#presetsPane").html());
 		}
 	};
 

@@ -82,18 +82,18 @@ window.TimestampThread = (function(){
 		},
 		// TODO - debounce!
 		store: function(){
-			var configs = this.fetch().configs,
+			var presets = this.fetch().presets,
 				timestamps = [];
 
 			this.timestamps.forEach(function(timestamp){
 				timestamps.push(timestamp.getParsable());
 			});
 
-			localStorage.ToDone = JSON.stringify({configs: configs, timestamps: timestamps});
+			localStorage.ToDone = JSON.stringify({presets: presets, timestamps: timestamps});
 		},
 		fetch: function(){
 			if(!localStorage.ToDone){
-				store('{"configs": [], "timestamps": []}');
+				store('{"presets": [], "timestamps": []}');
 			}
 			return JSON.parse(localStorage.ToDone);
 		}

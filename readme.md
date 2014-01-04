@@ -6,22 +6,16 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 	* edit timestamp
 	* add/remove tags
 	* delete
-	* change display type
-	* auto-cycle display types
-* general options menu
-	* clear local storage
-	* clear deleted timestamps
-	* light or dark theme
 * search/filter box
 	* filter by tag(s)
 	* filter by name
 	* tapping tag populates filter box with that tag
-* make new timestamp box into a type
-	* create configs
-	* store/retrieve configs from localstorage
+* new timestamp
+	* create presets
+	* store/retrieve presets from localstorage
 * break out color stuff from other style for easy swapping of light/dark theme
-* add way to flush deleted timestamps
-* cancel icon when editing name?
+* archive panel
+* make OS back button work?
 
 #BUGS
 * new timestamp card position can be off by scrollbar width in some cases
@@ -37,3 +31,4 @@ A web app aimed at making it easy to create a timestamp and attach a name and ta
 * sync across devices somehow? maybe export db? manual export as text file?
 * icons and colors for timestamps
 * compact view (similar to gmail mobile app list view)
+* cancel icon when editing name?

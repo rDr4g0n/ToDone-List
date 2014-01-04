@@ -60,8 +60,9 @@ header { display: block; }
 .timestamp .datetime .small { margin: -10px 0 7px 8px; color: #999;}
 .timestamp .datetime .soopa { vertical-align: super; font-size: .5em; letter-spacing: 0; padding-left: 4px; }
 
-.timestamp .edit, .timestamp .confirm { position: absolute; top: 8px; right: 5px; color: #CCC;}
-.timestamp .edit:active, .timestamp .confirm { color: #999; }
+.timestamp .edit, .timestamp .confirm, .timestamp .cancel { position: absolute; top: 8px; right: 5px; color: #CCC;}
+.timestamp .cancel { right: 25px;  }
+.timestamp .edit:active, .timestamp .confirm, .timestamp .cancel { color: #999; }
 
 .timestamp .tags { position: relative; padding: 6px 8px 2px 8px; font-size: .9em; border-top: dotted #EEE 2px; margin-top: 90px; color: #BF0252; } 
 .timestamp .tags .tagIcon { padding-right: 4px; display: inline-block; }
@@ -75,27 +76,29 @@ header { display: block; }
 .timestamp .tags.editable .tag .removeTag { display: inline; }
 .timestamp .tags.editable .addTag { display: inline; }
 
-.newTimestamp { position: fixed !important; top: 0; left: 0; z-index: 10; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; -webkit-transform: translateY(40px);
+.newTimestamp { position: fixed !important; top: 0; left: 0; z-index: 10; width: 100%; background-color: white; border-bottom: solid 2px #CCC; border-radius: 2px; color: #AAA; overflow: hidden; margin: 10px 0; font-size: 1.2em; 
+	-webkit-transform: translateY(40px);
 	-webkit-transition: -webkit-box-shadow .2s, top .5s, -webkit-transform .4s;
 }
 .newTimestamp.stickied { -webkit-box-shadow: 0 4px 10px 0 rgba(0,0,0,.65); }
 .newTimestamp.out { -webkit-transform: translateY(-75px); }
-.newTimestamp .newTimestampIcon { text-align: center; padding: 10px; font-size: 1.2em; border-bottom: dotted 2px #EEE; color: #BF0252; }
+
+.newTimestamp .plusIcon { float: left; padding: 10px 20px; color: #BF0252; font-size: 2em; border-right: dotted #CCC 2px;}
+.newTimestamp .presetWrapper { display: inline-block; position: relative; }
+.newTimestamp .presetName { cursor: pointer; color: #BF0252; padding: 0 5px; }
+.newTimestamp .preset { background: none; color: transparent; position: absolute; top:0; left: 0; }
+.newTimestamp .preset option { background: none; color: #AAA; }
+.newTimestamp .edit { position: absolute; top: 8px; right: 5px; color: #CCC; }
 
 select, input { font-family: inherit; font-size: inherit; background-color: transparent; color: inherit; outline: none; border: none;}
-select { -webkit-appearance: menulist-text; padding-right: 10px; background: url("arrow.png") center right no-repeat;}
+select { -webkit-appearance: menulist-text; }
 
-.dialogWrapper { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 100; background-color: rgba(0,0,0,.5); }
-.dialogWrapper.fade { background-color: rgba(0,0,0,0); }
-.dialog { width: 85%; height: 85%; position: absolute; top: 7%; left: 7%; z-index: 101; background-color: white; -webkit-transform: scale(1,1); opacity: 1; }
-.dialog.zoom { -webkit-transform: scale(.5,.5); opacity: 0; }
-
-.toast { position: fixed; bottom: 50px; left: 50px; padding: 5px 10px; color: #DDD; background-color: rgba(0,0,0,.75); border-radius: 2px; -webkit-transition: opacity .3s;}
+.toast { position: fixed; bottom: 50px; left: 50px; padding: 5px 10px; color: #DDD; background-color: rgba(0,0,0,.75); z-index: 500; border-radius: 2px; -webkit-transition: opacity .3s;}
 .toast.hide { opacity: 0; }
 .toast a { color: white; padding: 0 5px; }
 .toast i { padding: 0 5px; }
 
-.pane { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1000; background-color: #EEE; 
+.pane { width: 100%; height: 100%; position: fixed; top: 0; left: 0; z-index: 250; background-color: #EEE; 
 	opacity: 1; -webkit-transform: scale(1, 1);
 	-webkit-transition: opacity .2s, -webkit-transform ease-out .2s;
 }
@@ -123,4 +126,8 @@ body.dark { background: #212121; }
 .dark .timestamp .tags.editable .tag .removeTag { display: inline; background-color: white; color: #3d3d3d; padding-right: 4px; }
 .dark .actionBar { background-color: #333; border-bottom-color: #1F1F1F; border-top-color: #1F1F1F; color: white; }
 .dark .newTimestamp { background-color: #353535; border-bottom-color: black; color: #888; }
-.dark .newTimestamp .newTimestampIcon { border-bottom-color: #3d3d3d; color: #888; }
+.dark .newTimestamp .plusIcon { border-right-color: #3d3d3d; color: white; }
+.dark .newTimestamp .presetName { color: white; }
+.dark .pane { background-color: #333; color: white; }
+.dark .pane .paneItems li { border-bottom-color: #3d3d3d; }
+.dark .pane .paneItems li:active { background-color: #888; }

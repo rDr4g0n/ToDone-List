@@ -2,10 +2,9 @@ window.ls = (function(){
 
 	var fetch = function(id){
 		// TODO - make this generic instead of hardcoding
-		// ToDone config
-		// TODO - accept object key (config or timestamp)
+		// TODO - accept object key (preset or timestamp)
 		if(!localStorage.ToDone){
-			store('{"configs": [], "timestamps": []}');
+			store('{"presets": [], "timestamps": []}');
 		}
 
 		var lsToDone = JSON.parse(localStorage.ToDone);
@@ -64,7 +63,7 @@ window.ls = (function(){
 		},
 
 		asplode: function(){
-			store('{"configs": [], "timestamps": []}');
+			store('{"presets": [], "timestamps": []}');
 		}
 
 	};

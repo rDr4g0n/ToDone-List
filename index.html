@@ -21,8 +21,9 @@
 			<li class="addTag"><i class="fa fa-plus fa-lg"></i></li>
 		</ul>
 
-		<i class="fa fa-ellipsis-v fa-fw edit"></i>
+		<i class="fa fa-pencil-square-o fa-fw edit"></i>
 		<i class="fa fa-check fa-fw confirm" style="display:none;"></i>
+		<i class="fa fa-times fa-fw cancel" style="display:none;"></i>
 
 	</script>
 
@@ -63,16 +64,50 @@
 		</header>
 		<div class="paneItems">
 			<ul>
-				<li class="header">General</li>
-				<li>Clear archived timestamps</li>
-				<li>Clear all timestamps <span class="sub">This cannot be undone!</span></li>
-				<li>Night Theme <span class="control"><input type="checkbox"></span></li>
-			</ul>
-			<ul>
-				<li class="header">Contact</li>
-				<li>Contact my balls</li>
+				<li class="header">So many options</li>
+				<li class="nightTheme">Night Theme <span class="control"><input type="checkbox"></span></li>
+				<li class="deleteAll">
+					Delete all of the things
+					<div class="sub">This cant be undone bra!</div>
+				</li>
 			</ul>
 		</div>
+	</script>
+
+	<script type="text/x-underscore-template" id="presetsPane">
+		<header class="actionBar">				
+			<span style="margin:8px;" class="appIcon">
+				<i class="fa fa-chevron-left" style="padding-left: 4px;"></i>
+				<i class="fa fa-check-square-o fa-lg"></i>
+				Presets
+			</span>
+		</header>
+		<div class="paneItems">
+			<ul>
+				<li class="header">The usual</li>
+				<li>Choose Default Preset</li>
+				<li>Create New Preset</li>
+			</ul>
+			<ul>
+				<li class="header">Edit Presets</li>
+				<li>default</li>
+				<li>Feeding</li>
+				<li>Took a dump</li>
+			</ul>
+		</div>
+	</script>
+
+	<script type="text/x-underscore-template" id="newTimestampTemplate">
+		<div class="plusIcon"><i class="fa fa-check-square-o"></i></div>
+		<div style="padding: 20px 0 0 90px;">
+			<span>Its</span>
+			<div class="presetWrapper">
+				<select class="preset"></select>				
+				<div class="presetName"></div>
+			</div>
+			<span>time!</span>
+		</div>
+		<i class="fa fa-cog fa-fw edit"></i>
 	</script>
 
 	<header class="actionBar">
@@ -81,20 +116,8 @@
 		<a href="#" style="float:right;" class=""><i class="fa fa-search fa-2x"></i></a>
 	</header>
 
-	<div id="newTimestamp" class="newTimestamp">
-		<div class="newTimestampIcon">
-			Add Timestamp
-		</div>
-		<div style="text-align: center; padding: 10px; ">
-			<select class="config">
-				<option value="default">Default Timestamp</option>
-				<option value="feeding">Feeding</option>
-			</select>
-		</div>
-	</div>
 
-
-	<div class="wrapper" style="margin-top: 145px;"></div>
+	<div class="wrapper" style="margin-top: 125px;"></div>
 
 	<script src="lib/jquery-2.0.3.min.js"></script>
 	<script src="lib/underscore.min.js"></script>
@@ -109,10 +132,35 @@
 		$(document).ready(function(){
 			// TODO - multiple timestampThreads
 			var timestampThread = new TimestampThread(ls.get().timestamps.reverse() || [], $(".wrapper"));
-			new TimestampSpawner(timestampThread);
+			$(".wrapper").before(new TimestampSpawner(timestampThread).$el);
 
 			$(".options").on("click", function(){
-				popPane($("#settingsPane").html());
+				popPane($("#settingsPane").html(), {
+					"click .nightTheme": function(e){
+
+						var checkbox = $(e.currentTarget).find("input"),
+							isChecked = checkbox.is(":checked");
+
+						if(isChecked){
+							$("body").removeClass("dark");
+							toast("Ahh, I see you've returned to your senses.");
+						} else {
+							$("body").addClass("dark");
+							toast("Don't like the magenta?");
+						}
+
+						checkbox.prop("checked", !isChecked);
+
+						// TODO - deal with clicking the checkbox instead of li
+					},
+					"click .deleteAll": function(){
+						// TODO - use dialogs for this isntead of alerts
+						if(confirm("Are you sure you want to delete *all* of the things?")){
+							asplode();
+							alert("All of the things are gone. Hope it works out for you bud.");
+						}
+					}
+				});
 			});
 		});
 
@@ -154,7 +202,7 @@
 
 		// TODO - remove this when done testing
 		function asplode(){
-			localStorage.ToDone = '{"configs": [], "timestamps": []}';
+			localStorage.ToDone = '{"presets": [], "timestamps": []}';
 		}
 
 
@@ -181,7 +229,9 @@
 			}, 2000);
 		}
 
-		function popPane(template){
+		function popPane(template, eventMap){
+			eventMap = eventMap || {};
+
 			// TODO - make back button navigate back
 			var $pane = $("<div class='pane'>"+ template +"</div>");
 			$pane.find(".appIcon").on("click", function(){
@@ -189,8 +239,29 @@
 					$pane.remove();
 				}});
 			});
+
+			bindEvents($pane, eventMap);
+
 			$("body").append($pane);
 			cssAnimate($pane, {start: "enter"});
+		}
+
+		// TODO - reuse this method for all modules
+		function bindEvents($el, eventMap, context){
+			if(!context) context = this;
+
+			var func, selector, eventAction;
+
+			for(var i in eventMap){
+				selector = i.split(" ");
+				eventAction = selector.shift();
+				selector = selector.join(" ");
+				func = eventMap[i];
+
+				if (typeof (func) == "function") {
+					$el.on(eventAction, selector, func.bind(context));
+				}
+			}
 		}
 
 

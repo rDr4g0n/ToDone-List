@@ -60,23 +60,23 @@ window.Timestamp = (function(){
 		}
 	};
 
-	function Timestamp(config, animateIn){
+	function Timestamp(preset, animateIn){
 		var $datetimes;
 
-		config = config || {};
+		preset = preset || {};
 
-		this.id = config.id || uuid();
+		this.id = preset.id || uuid();
 
-		this.archived = config.archived || false;
+		this.archived = preset.archived || false;
 
 		// TODO - use set function on model
 		// 	and debounce updates to store
 		this.model = {};
-		this.model.timestamp = config.timestamp ? new moment(config.timestamp) : new moment();
-		this.model.name = config.name || "New Timestamp";
-		this.model.tags = config.tags.slice() || [];
+		this.model.timestamp = preset.timestamp ? new moment(preset.timestamp) : new moment();
+		this.model.name = preset.name || "New Timestamp";
+		this.model.tags = preset.tags.slice() || [];
 
-		this.display = (typeof config.display === "number" ? config.display : 1);
+		this.display = (typeof preset.display === "number" ? preset.display : 1);
 
 		this.editingTags = false;
 
@@ -103,7 +103,8 @@ window.Timestamp = (function(){
 			"click .removeTag": "removeTag",
 			"click .addTag": "addTag",
 			"click .datetimes": "showNextDisplay",
-			"click .edit": function(){this.archive();}.bind(this),
+			"click .edit": "edit",
+			"click .cancel": "cancelEditName",
 			"touchstart": "touchstart",
 			"touchmove": "touchmove",
 			"touchend": "touchend",
@@ -138,9 +139,9 @@ window.Timestamp = (function(){
 
 		this.bindEvents();
 
-		// if config.id isnt set, this is a new timestamp
+		// if preset.id isnt set, this is a new timestamp
 		// and needs to be stored
-		// if(!config.id) this.store();
+		// if(!preset.id) this.store();
 		this.store();
 	}
 
@@ -332,7 +333,7 @@ window.Timestamp = (function(){
 			return Math.max(1 - (Math.abs(x) / this.SWIPE_TO_DELETE_THRESHOLD), .4);
 		},
 
-		// store in localstorage anytime model or config changes
+		// store in localstorage anytime model or preset changes
 		store: function(){
 			this.emit("dirty");
 		},
@@ -350,6 +351,11 @@ window.Timestamp = (function(){
 		unarchive: function(){
 			this.archived = false;
 			this.store();
+		},
+
+		edit: function(){
+			// pop up edit dialog
+			alert("edit!");
 		}
 	};
 
